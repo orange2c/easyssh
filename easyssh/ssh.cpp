@@ -68,7 +68,7 @@ int SSH::connect_ip(QString host)
    while((rc = libssh2_session_handshake(session, sock)) ==
           LIBSSH2_ERROR_EAGAIN);
    if(rc) {
-       fprintf(stderr, "Failure establishing SSH session: %d\n", rc);
+       qDebug( "Failure establishing SSH session: %d\n", rc);
        return -1;
    }
 
@@ -286,38 +286,32 @@ QString SSH::read()
     QString re_value;
     while(1)
     {
-        char buffer[0x4000];
+
+        char buffer[100];
            /* loop until we block */
-        do {
+        do{
             rc = libssh2_channel_read(channel, buffer, sizeof(buffer) );
-            if(rc > 0) {
-                   int i;
-                   bytecount += rc;
-                   fprintf(stderr, "We read:\n");
-                   for(i = 0; i < rc; ++i)
-                   {
-                       re_value.append(buffer[i]);
-                       fputc(buffer[i], stderr);
+            if(rc > 0)
+            {
+                bytecount += rc;
+                fprintf(stderr, "We read:\n");
+                for(int i = 0; i < rc; ++i)
+                {
+                    re_value.append(buffer[i]);
+                }
+            }
+            else
+            {
+                if(rc != LIBSSH2_ERROR_EAGAIN)
+                    qDebug("libssh2_channel_read returned %d\n", rc);
+            }
+        }while(rc > 0);
 
-                   }
-                   fprintf(stderr, "\n");
-               }
-               else {
-                   if(rc != LIBSSH2_ERROR_EAGAIN)
-                       /* no need to output this for the EAGAIN case */
-                       fprintf(stderr, "libssh2_channel_read returned %d\n", rc);
-               }
-           }
-           while(rc > 0);
-
-           /* this is due to blocking that would occur otherwise so we loop on
-              this condition */
-           if(rc == LIBSSH2_ERROR_EAGAIN) {
-               waitsocket(sock, session);
-           }
-           else
-               break;
-       }
+        if(rc == LIBSSH2_ERROR_EAGAIN)
+            waitsocket(sock, session);
+        else
+            break;
+    }
        exitcode = 127;
        while((rc = libssh2_channel_close(channel)) == LIBSSH2_ERROR_EAGAIN)
            waitsocket(sock, session);
@@ -327,7 +321,6 @@ QString SSH::read()
            libssh2_channel_get_exit_signal(channel, &exitsignal,
                                            NULL, NULL, NULL, NULL, NULL);
        }
-
        if(exitsignal)
            fprintf(stderr, "\nGot signal: %s\n", exitsignal);
        else

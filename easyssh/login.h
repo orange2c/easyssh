@@ -2,6 +2,7 @@
 #define LOGIN_H
 
 #include <QDialog>
+#include "ssh.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class login; }
@@ -17,5 +18,6 @@ public:
 
 private:
     Ui::login *ui;
+    SSH *ssh = new SSH();
 };
 #endif // LOGIN_H
