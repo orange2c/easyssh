@@ -2,19 +2,6 @@
 
 SSH::SSH()
 {
-
-}
-
-void SSH::set_login_info(QString host, QString user, QString pwd)
-{
-
-    QByteArray *host_str = new QByteArray(host.toLatin1());
-    HOST = host_str->data();
-    QByteArray *usr_str = new QByteArray(user.toLatin1());
-    USER = usr_str->data();
-    QByteArray *pword_str = new QByteArray(pwd.toLatin1());
-    PASSWORD = pword_str->data();
-
 #ifdef Q_OS_WIN32
     int err;
     err = WSAStartup(MAKEWORD(2, 0), &wsadata);
@@ -23,94 +10,219 @@ void SSH::set_login_info(QString host, QString user, QString pwd)
         return 1;
     }
 #endif
-
-    hostaddr = inet_addr(HOST);
-    qDebug("HOST=%s",HOST);
+    sock = socket(AF_INET, SOCK_STREAM, 0);
 }
 
-int SSH::login(void)
+SSH::~SSH()
+{
+    libssh2_channel_free(channel);
+    channel = NULL;
+    libssh2_session_disconnect(session,
+                               "Normal Shutdown, Thank you for playing");
+    libssh2_session_free(session);
+
+#ifdef WIN32
+    closesocket(sock);
+#else
+    close(sock);
+#endif
+
+    fprintf(stderr, "all done\n");
+    libssh2_exit();
+
+
+}
+
+int SSH::connect_ip(QString host)
 {
 
+    hostaddr = inet_addr( QByteArray(host.toLatin1()).data() );
+    qDebug("HOST=%s",qPrintable(host));
 
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(22);
+    sin.sin_addr.s_addr = hostaddr;
+//    qDebug("hostaddr = %ld",hostaddr);
 
-    /* Ultra basic "connect to port 22 on localhost"
-      * Your code is responsible for creating the socket establishing the
-      * connection
-      */
-     sock = socket(AF_INET, SOCK_STREAM, 0);
-
-     sin.sin_family = AF_INET;
-     sin.sin_port = htons(22);
-     sin.sin_addr.s_addr = hostaddr;
-     qDebug("hostaddr = %ld",hostaddr);
-     if(connect(sock, (struct sockaddr*)(&sin),
-                 sizeof(struct sockaddr_in)) != 0) {
-         qDebug("connect !=0");
-         return -1;
-     }
-     qDebug("connect ==0");
-
-     /* Create a session instance */
-     session = libssh2_session_init();
-     if(!session)
-         return -1;
-     /* tell libssh2 we want it all done non-blocking */
-     libssh2_session_set_blocking(session, 0);
-
-    /* ... start it up. This will trade welcome banners, exchange keys,
-     * and setup crypto, compression, and MAC layers
-     */
-    int rc;
-    while((rc = libssh2_session_handshake(session, sock)) ==
-           LIBSSH2_ERROR_EAGAIN);
-    if(rc) {
-        fprintf(stderr, "Failure establishing SSH session: %d\n", rc);
+    if(connect(sock, (struct sockaddr*)(&sin),
+                sizeof(struct sockaddr_in)) != 0)
+    {
+        qDebug("ip地址错误");
         return -1;
     }
+    qDebug("connect ==0");
+    QByteArray *host_str = new QByteArray(host.toLatin1());
+    HOST = host_str->data(); //申请内存，将HOST保存起来
 
-    nh = libssh2_knownhost_init(session);
-    if(!nh) {
-        /* eeek, do cleanup here */
-        return 2;
-    }
+    /* Create a session instance */
+    session = libssh2_session_init();
+    if(!session)
+        return -1;
+    /* tell libssh2 we want it all done non-blocking */
+    libssh2_session_set_blocking(session, 0);
 
-    /* read all hosts from here */
-    libssh2_knownhost_readfile(nh, "known_hosts",
+   /* ... start it up. This will trade welcome banners, exchange keys,
+    * and setup crypto, compression, and MAC layers
+    */
+   int rc;
+   while((rc = libssh2_session_handshake(session, sock)) ==
+          LIBSSH2_ERROR_EAGAIN);
+   if(rc) {
+       fprintf(stderr, "Failure establishing SSH session: %d\n", rc);
+       return -1;
+   }
+
+   nh = libssh2_knownhost_init(session);
+   if(!nh) {
+       /* eeek, do cleanup here */
+       return 2;
+   }
+   /* read all hosts from here */
+   libssh2_knownhost_readfile(nh, "known_hosts",
+                              LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+   /* store all known hosts to here */
+   libssh2_knownhost_writefile(nh, "dumpfile",
                                LIBSSH2_KNOWNHOST_FILE_OPENSSH);
 
-    /* store all known hosts to here */
-    libssh2_knownhost_writefile(nh, "dumpfile",
-                                LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+   fingerprint = libssh2_session_hostkey(session, &len, &type);
+   if(fingerprint) {
+       struct libssh2_knownhost *host;
+       int check = libssh2_knownhost_checkp(nh, HOST, 22,
+                                            fingerprint, len,
+                                            LIBSSH2_KNOWNHOST_TYPE_PLAIN|
+                                            LIBSSH2_KNOWNHOST_KEYENC_RAW,
+                                            &host);
+       fprintf(stderr, "Host check: %d, key: %s\n", check,
+               (check <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH)?
+               host->key:"<none>");
 
-    fingerprint = libssh2_session_hostkey(session, &len, &type);
-
-    if(fingerprint) {
-        struct libssh2_knownhost *host;
-        int check = libssh2_knownhost_checkp(nh, HOST, 22,
-                                             fingerprint, len,
-                                             LIBSSH2_KNOWNHOST_TYPE_PLAIN|
-                                             LIBSSH2_KNOWNHOST_KEYENC_RAW,
-                                             &host);
-        fprintf(stderr, "Host check: %d, key: %s\n", check,
-                (check <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH)?
-                host->key:"<none>");
-
-    }
-    else {
-        /* eeek, do cleanup here */
-        return 3;
-    }
-    libssh2_knownhost_free(nh);
-
-          while((rc = libssh2_userauth_password(session, USER, PASSWORD)) ==
-                 LIBSSH2_ERROR_EAGAIN);
-          if(rc) {
-              fprintf(stderr, "Authentication by password failed.\n");
-          }
-
+   }
+   else {
+       /* eeek, do cleanup here */
+       return 3;
+   }
+   libssh2_knownhost_free(nh);
 
     return 0;
 }
+int SSH::login(QString user, QString pwd)
+{
+    int rc;
+
+
+    QByteArray *usr_str = new QByteArray(user.toLatin1());
+    const char *username = usr_str->data();
+    QByteArray *pword_str = new QByteArray(pwd.toLatin1());
+    const char *password = pword_str->data();
+
+    while((rc = libssh2_userauth_password(session, username, password)) ==
+           LIBSSH2_ERROR_EAGAIN);
+    if(rc) {
+        qDebug( "Authentication by password failed.\n");
+        delete usr_str;
+        delete pword_str;
+        return -1;
+    }
+    USER = username;
+    PASSWORD = password;
+    return 0;
+}
+
+
+
+//void SSH::set_login_info(QString host, QString user, QString pwd)
+//{
+
+//    QByteArray *host_str = new QByteArray(host.toLatin1());
+//    HOST = host_str->data();
+//    QByteArray *usr_str = new QByteArray(user.toLatin1());
+//    USER = usr_str->data();
+//    QByteArray *pword_str = new QByteArray(pwd.toLatin1());
+//    PASSWORD = pword_str->data();
+
+//    hostaddr = inet_addr(HOST);
+//    qDebug("HOST=%s",HOST);
+
+//}
+
+//int SSH::login(void)
+//{
+//    /* Ultra basic "connect to port 22 on localhost"
+//      * Your code is responsible for creating the socket establishing the
+//      * connection
+//      */
+
+
+//     sin.sin_family = AF_INET;
+//     sin.sin_port = htons(22);
+//     sin.sin_addr.s_addr = hostaddr;
+//     qDebug("hostaddr = %ld",hostaddr);
+//     if(connect(sock, (struct sockaddr*)(&sin),
+//                 sizeof(struct sockaddr_in)) != 0) {
+//         qDebug("connect !=0");
+//         return -1;
+//     }
+//     qDebug("connect ==0");
+
+//     /* Create a session instance */
+//     session = libssh2_session_init();
+//     if(!session)
+//         return -1;
+//     /* tell libssh2 we want it all done non-blocking */
+//     libssh2_session_set_blocking(session, 0);
+
+//    /* ... start it up. This will trade welcome banners, exchange keys,
+//     * and setup crypto, compression, and MAC layers
+//     */
+//    int rc;
+//    while((rc = libssh2_session_handshake(session, sock)) ==
+//           LIBSSH2_ERROR_EAGAIN);
+//    if(rc) {
+//        fprintf(stderr, "Failure establishing SSH session: %d\n", rc);
+//        return -1;
+//    }
+
+//    nh = libssh2_knownhost_init(session);
+//    if(!nh) {
+//        /* eeek, do cleanup here */
+//        return 2;
+//    }
+
+//    /* read all hosts from here */
+//    libssh2_knownhost_readfile(nh, "known_hosts",
+//                               LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+
+//    /* store all known hosts to here */
+//    libssh2_knownhost_writefile(nh, "dumpfile",
+//                                LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+
+//    fingerprint = libssh2_session_hostkey(session, &len, &type);
+
+//    if(fingerprint) {
+//        struct libssh2_knownhost *host;
+//        int check = libssh2_knownhost_checkp(nh, HOST, 22,
+//                                             fingerprint, len,
+//                                             LIBSSH2_KNOWNHOST_TYPE_PLAIN|
+//                                             LIBSSH2_KNOWNHOST_KEYENC_RAW,
+//                                             &host);
+//        fprintf(stderr, "Host check: %d, key: %s\n", check,
+//                (check <= LIBSSH2_KNOWNHOST_CHECK_MISMATCH)?
+//                host->key:"<none>");
+
+//    }
+//    else {
+//        /* eeek, do cleanup here */
+//        return 3;
+//    }
+//    libssh2_knownhost_free(nh);
+
+//          while((rc = libssh2_userauth_password(session, USER, PASSWORD)) ==
+//                 LIBSSH2_ERROR_EAGAIN);
+//          if(rc) {
+//              fprintf(stderr, "Authentication by password failed.\n");
+//          }
+//    return 0;
+//}
 int SSH::waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 {
     struct timeval timeout;
@@ -225,8 +337,3 @@ QString SSH::read()
 
 }
 
-void SSH::shutdown()
-{
-    libssh2_channel_free(channel);
-    channel = NULL;
-}
