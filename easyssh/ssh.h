@@ -33,6 +33,8 @@ public:
 
     int write( QString cmd );
     QString read();
+
+    int sock;
 protected:
      int waitsocket(int socket_fd, LIBSSH2_SESSION *session);
 
@@ -41,7 +43,7 @@ protected:
     const char *PASSWORD    = "password";
 
     unsigned long hostaddr;
-    int sock;
+
 
     int exitcode;
     char *exitsignal = (char *)"none";
@@ -55,10 +57,7 @@ protected:
     int type;
     size_t len;
     LIBSSH2_KNOWNHOSTS *nh;
-
-
-
-
 };
+
 
 #endif // SSH_H

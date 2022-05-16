@@ -7,8 +7,9 @@ MainCmd::MainCmd(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->Edit_cmd->insertPlainText("sss");
-    ui->Edit_cmd->insertPlainText("hello");
+//    ui->Edit_cmd->insertPlainText("sss");
+//    ui->Edit_cmd->insertPlainText("hello");
+//    ssh->write("pwd" );
 
 }
 
@@ -21,10 +22,7 @@ void MainCmd::setssh(SSH *p_ssh)
     ssh = p_ssh;
 }
 
-void MainCmd::on_Edit_cmd_textChanged()
-{
 
-}
 void MainCmd::keyPressEvent(QKeyEvent *event)
 {
     qDebug("last=%d,now=%d", last_key, event->key());
@@ -75,9 +73,27 @@ void MainCmd::on_Edit_cmd_cursorPositionChanged()
     qDebug("line:%d",docCursor.blockNumber());
     qDebug("text=%s", qPrintable( ui->Edit_cmd->document()->findBlockByLineNumber(docCursor.blockNumber() ).text()   ));
 
+    QString text = ui->Edit_cmd->toPlainText();
+
+    if( docCursor.atEnd() && last_pos<docCursor.position() )
+    {
+        qDebug("新输入字符%c",  text.at( text.size()-1 ) );
+        ssh->write(QString( text.at( text.size()-1 )) );
+
+         qDebug("新输入字符%c",  text.at( text.size()-1 ) );
+        ui->Edit_show->insertPlainText( ssh->read() );
+    }
+    if( docCursor.blockNumber()>=1 && docCursor.positionInBlock() == 0 )
+    {
+        ssh->write( "\r\n" );
+        ui->Edit_show->insertPlainText( ssh->read() );
+    }
+    //如果行数增加到1，且光标为0，则发送回车
+    //如果
 
 
     last_block_number = docCursor.blockNumber();
     last_pos = docCursor.position();
+
 }
 

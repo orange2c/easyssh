@@ -43,7 +43,6 @@ void login::on_pushButton_released()
     {
         return;
     }
-
     qDebug("登陆成功");
     MainCmd *mcmd = new MainCmd();
     mcmd->setssh(ssh);

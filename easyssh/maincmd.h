@@ -20,7 +20,6 @@ public:
     ~MainCmd();
 
 private slots:
-    void on_Edit_cmd_textChanged();
 
     void on_Edit_cmd_selectionChanged();
 

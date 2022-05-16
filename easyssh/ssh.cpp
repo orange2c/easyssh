@@ -1,5 +1,6 @@
 #include "ssh.h"
 
+
 SSH::SSH()
 {
 #ifdef WIN32
