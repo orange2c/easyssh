@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "ssh.h"
+#include "maincmd.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class login; }
@@ -15,6 +16,9 @@ class login : public QDialog
 public:
     login(QWidget *parent = nullptr);
     ~login();
+
+private slots:
+    void on_pushButton_released();
 
 private:
     Ui::login *ui;

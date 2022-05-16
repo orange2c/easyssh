@@ -31,10 +31,6 @@ public:
     int login( QString user, QString pwd );
     int reconnect();
 
-    void set_login_info( QString host, QString user, QString pwd );
-    int login();
-
-
     int write( QString cmd );
     QString read();
 protected:
