@@ -126,6 +126,10 @@ int SSH::login(QString user, QString pwd)
     }
     USER = username;
     PASSWORD = password;
+
+
+     qDebug("return");
+
     return 0;
 }
 
@@ -164,6 +168,9 @@ int SSH::write(QString cmd)
 {
     int rc;
     char *cmdline = QByteArray(cmd.toLatin1()).data();
+//    size_t data_size = cmd.size();
+//    qDebug("write2 size=%d,buf=%s", data_size, cmdline);
+
 
     /* Exec non-blocking on the remove host */
     while((channel = libssh2_channel_open_session(session)) == NULL &&
@@ -176,6 +183,7 @@ int SSH::write(QString cmd)
         exit(1);
     }
 
+
     while((rc = libssh2_channel_exec(channel, cmdline)) ==
            LIBSSH2_ERROR_EAGAIN) {
         waitsocket(sock, session);
@@ -184,9 +192,31 @@ int SSH::write(QString cmd)
         fprintf(stderr, "Error\n");
         exit(1);
     }
+
     return 0;
 
 }
+int SSH::write2(QString cmd)
+{
+
+    int rc;
+    char *cmdline = QByteArray(cmd.toLatin1()).data();
+
+    size_t data_size = cmd.size();
+//    qDebug("write2 size=%d,buf=%s", data_size, cmdline);
+
+    while((rc = libssh2_channel_write( channel, cmdline, data_size )) ==
+           LIBSSH2_ERROR_EAGAIN) {
+        waitsocket(sock, session);
+        qDebug("while");
+    }
+    if(rc != 0) {
+        fprintf(stderr, "Error\n");
+        exit(1);
+    }
+    return 0;
+}
+
 QString SSH::read()
 {
     int rc;

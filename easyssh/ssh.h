@@ -32,6 +32,7 @@ public:
     int reconnect();
 
     int write( QString cmd );
+    int write2( QString cmd );
     QString read();
 
     int sock;
