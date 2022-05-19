@@ -40,10 +40,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
     bool parseSuccess;
-//    const QSsh::SshConnectionParameters &parameters
-//        = ArgumentsCollector(app.arguments()).collect(parseSuccess);
 
-//    const QStringList *login_message = new QStringList;
      QStringList login_message = {"", "-h", "192.168.103.116", "-u", "cb", "-pwd", "123456"};
 
     const QSsh::SshConnectionParameters &parameters
