@@ -12,12 +12,14 @@ SOURCES += \
     main.cpp \
     login.cpp \
     maincmd.cpp \
-    ssh.cpp
+    ssh.cpp \
+    ssh_argument.cpp
 
 HEADERS += \
     login.h \
     maincmd.h \
-    ssh.h
+    ssh.h \
+    ssh_argument.h
 
 FORMS += \
     login.ui \
@@ -36,4 +38,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 INCLUDEPATH += include/
 
-LIBS += -L$${PWD}\lib -lQSshd -lQSsh
+LIBS += -L$${PWD}\lib -lQSshd
+#-lQSsh

@@ -2,6 +2,12 @@
 #define SSH_H
 
 
+
+
+
+#ifdef WIN32
+#include <winsock2.h>
+#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/select.h>
@@ -14,12 +20,8 @@
 #include <errno.h>
 #include <stdio.h>
 #include <ctype.h>
-
-#ifdef Q_OS_WIN32
-#include <winsock2.h>
 #endif
 
-#include <libssh2.h>
 #include <QString>
 class SSH
 {

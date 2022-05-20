@@ -11,28 +11,6 @@
 
 
 
-#include <netinet/in.h>
-#include <sys/select.h>
-
-#include <unistd.h>
-
-#include <arpa/inet.h>
-
-#include <sys/time.h>
-
-#include <sys/types.h>
-
-#include <stdlib.h>
-#include <sys/select.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-
-
-extern "C"{
-//    #include "libssh2_config.h"
-    #include <libssh2.h>
-}
-
 int main(int argc, char *argv[])
 {
 
