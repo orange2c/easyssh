@@ -17,10 +17,10 @@ MainCmd::~MainCmd()
 {
     delete ui;
 }
-void MainCmd::setssh(SSH *p_ssh)
-{
-    ssh = p_ssh;
-}
+//void MainCmd::setssh(SSH *p_ssh)
+//{
+//    ssh = p_ssh;
+//}
 
 
 void MainCmd::keyPressEvent(QKeyEvent *event)
@@ -75,19 +75,19 @@ void MainCmd::on_Edit_cmd_cursorPositionChanged()
 
     QString text = ui->Edit_cmd->toPlainText();
 
-    if( docCursor.atEnd() && last_pos<docCursor.position() )
-    {
-        qDebug("新输入字符%c",  text.at( text.size()-1 ) );
-        ssh->write(QString( text.at( text.size()-1 )) );
+//    if( docCursor.atEnd() && last_pos<docCursor.position() )
+//    {
+//        qDebug("新输入字符%c",  text.at( text.size()-1 ) );
+//        ssh->write(QString( text.at( text.size()-1 )) );
 
-         qDebug("新输入字符%c",  text.at( text.size()-1 ) );
-        ui->Edit_show->insertPlainText( ssh->read() );
-    }
-    if( docCursor.blockNumber()>=1 && docCursor.positionInBlock() == 0 )
-    {
-        ssh->write( "\r\n" );
-        ui->Edit_show->insertPlainText( ssh->read() );
-    }
+//         qDebug("新输入字符%c",  text.at( text.size()-1 ) );
+//        ui->Edit_show->insertPlainText( ssh->read() );
+//    }
+//    if( docCursor.blockNumber()>=1 && docCursor.positionInBlock() == 0 )
+//    {
+//        ssh->write( "\r\n" );
+//        ui->Edit_show->insertPlainText( ssh->read() );
+//    }
     //如果行数增加到1，且光标为0，则发送回车
     //如果
 

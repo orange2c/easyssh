@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,14 +12,12 @@ SOURCES += \
     main.cpp \
     login.cpp \
     maincmd.cpp \
-    ssh.cpp \
-    ssh_argument.cpp
+    ssh.cpp
 
 HEADERS += \
     login.h \
     maincmd.h \
-    ssh.h \
-    ssh_argument.h
+    ssh.h
 
 FORMS += \
     login.ui \

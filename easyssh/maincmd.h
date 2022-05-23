@@ -2,7 +2,6 @@
 #define MAINCMD_H
 
 #include <QMainWindow>
-#include "ssh.h"
 #include <QKeyEvent>
 #include <QTextList>
 
@@ -16,7 +15,6 @@ class MainCmd : public QMainWindow
 
 public:
     explicit MainCmd(QWidget *parent = nullptr);
-    void setssh(SSH *p_ssh);
     ~MainCmd();
 
 private slots:
@@ -29,7 +27,6 @@ private slots:
 
 private:
     Ui::MainCmd *ui;
-    SSH *ssh;
 
     int last_key = 0; //按下组合键时会被拆成多次调用
     int last_pos = 0;
