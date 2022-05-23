@@ -19,6 +19,8 @@ public:
 
 private slots:
     void on_pushButton_released();
+    void connect_success();
+    void connect_error();
 
 private:
     Ui::login *ui;

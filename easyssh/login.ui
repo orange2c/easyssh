@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>215</width>
-    <height>250</height>
+    <width>292</width>
+    <height>333</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>login</string>
   </property>
   <widget class="QPushButton" name="pushButton">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>60</x>
@@ -57,8 +60,8 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>181</width>
-     <height>31</height>
+     <width>251</width>
+     <height>41</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">

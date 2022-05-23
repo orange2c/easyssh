@@ -7,7 +7,7 @@ SSH::SSH(QObject *parent) : QObject(parent)
     argment.authenticationType =  SshConnectionParameters::AuthenticationTypeTryAllPasswordBasedMethods;
     argment.options &= ~SshIgnoreDefaultProxy;
 }
-int SSH::login(QString Host, QString username, QString password)
+void SSH::login(QString Host, QString username, QString password)
 {
     argment.host= Host ;
     argment.userName = username ;
@@ -15,13 +15,21 @@ int SSH::login(QString Host, QString username, QString password)
 
     if( m_connection != NULL ) delete m_connection;
     m_connection = new SshConnection( argment) ;
-    connect(m_connection, SIGNAL(error(QSsh::SshError)), this, SLOT(handleConnectionError()));
 
-    return -2;
+
+    connect(m_connection, SIGNAL( error(QSsh::SshError) ), this, SLOT(_connect_error()));
+    connect(m_connection, SIGNAL( connected()), this, SLOT(_connect_success()));
+
+    m_connection->connectToHost();
 }
 
-void SSH::handleConnectionError()
+void SSH::_connect_success()
 {
-    qDebug("connect error");
-
+    qDebug("连接成功");
+    emit connect_success();
+}
+void SSH::_connect_error()
+{
+    qDebug("连接失败");
+    emit connect_error();
 }

@@ -14,7 +14,8 @@ login::login(QWidget *parent)
     ui->Edit_user->setText( "cb" );
     ui->Edit_password->setText( "123456" );
 
-
+    connect( ssh, SIGNAL(connect_success()), this, SLOT(connect_success()) );
+    connect( ssh, SIGNAL(connect_error()), this, SLOT(connect_error()) );
 }
 
 login::~login()
@@ -22,34 +23,26 @@ login::~login()
     delete ui;
 }
 
+void login::connect_success()
+{
+    MainCmd *mcmd = new MainCmd();
+    mcmd->show();
+    this->close();
+}
+void login::connect_error()
+{
+    ui->pushButton->setEnabled(true);
+}
+
 
 void login::on_pushButton_released()
 {
 
-//    if( ssh->connect_ip(ui->Edit_ip->toPlainText()) != 0 )
-//    {
-//        qDebug("ip error");
-//        return;
-//    }
-//    if( ssh->login( ui->Edit_user->toPlainText(), ui->Edit_password->toPlainText() ) !=0 )
-//    {
-//        return;
-//    }
-    if( ssh->login( ui->Edit_ip->toPlainText(), ui->Edit_user->toPlainText(), ui->Edit_password->toPlainText() ) < 0 )
-    {
-        qDebug("登陆失败");
-        return;
-    }
-    qDebug("登陆成功");
-//    qDebug( "write:%d",  ssh->write("cd .."));
-//    qDebug("read:%s", qPrintable( ssh->read() ) );
-//        qDebug( "write:%d",  ssh->write("pwd"));
-//        qDebug("read:%s", qPrintable( ssh->read() ) );
+    ssh->login( ui->Edit_ip->toPlainText(), ui->Edit_user->toPlainText(), ui->Edit_password->toPlainText() );
 
-    MainCmd *mcmd = new MainCmd();
-//    mcmd->setssh(ssh);
-    mcmd->show();
-    this->close();
+    ui->pushButton->setEnabled(false);
+
+
 
 }
 
