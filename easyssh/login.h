@@ -22,6 +22,7 @@ private slots:
     void connect_success();
     void connect_error();
 
+
 private:
     Ui::login *ui;
     SSH *ssh;

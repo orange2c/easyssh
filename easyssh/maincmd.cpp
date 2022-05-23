@@ -1,15 +1,14 @@
 #include "maincmd.h"
 #include "ui_maincmd.h"
 
-MainCmd::MainCmd(QWidget *parent) :
+MainCmd::MainCmd( SSH *p_ssh, QWidget *parent ) :
     QMainWindow(parent),
-    ui(new Ui::MainCmd)
+    ui(new Ui::MainCmd),
+    ssh( p_ssh )
+
 {
     ui->setupUi(this);
-
-//    ui->Edit_cmd->insertPlainText("sss");
-//    ui->Edit_cmd->insertPlainText("hello");
-//    ssh->write("pwd" );
+    connect( ssh, SIGNAL(shell_output(QString)), SLOT(shell_output(QString)) );
 
 }
 
@@ -43,6 +42,8 @@ void MainCmd::keyPressEvent(QKeyEvent *event)
         ui->Edit_cmd->insertPlainText(qb.data());
     }
     last_key = k;
+
+
 }
 
 void MainCmd::on_Edit_cmd_selectionChanged()
@@ -54,6 +55,11 @@ void MainCmd::on_Edit_cmd_selectionChanged()
 void MainCmd::on_Edit_2_cursorPositionChanged()
 {
 
+}
+void MainCmd::shell_output( QString data )
+{
+    ui->Edit_show->insertPlainText(data);
+    ui->Edit_show->moveCursor(QTextCursor::End);
 }
 
 
@@ -97,3 +103,10 @@ void MainCmd::on_Edit_cmd_cursorPositionChanged()
 
 }
 
+
+
+void MainCmd::on_Button1_clicked()
+{
+    qDebug("测试发送");
+    ssh->write("wall hello\n");
+}

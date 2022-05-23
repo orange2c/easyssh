@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>463</width>
-    <height>283</height>
+    <width>661</width>
+    <height>420</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="Button1">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>180</y>
+      <x>240</x>
+      <y>330</y>
       <width>89</width>
       <height>25</height>
      </rect>
@@ -31,9 +31,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
-      <width>401</width>
-      <height>51</height>
+      <y>210</y>
+      <width>601</width>
+      <height>91</height>
      </rect>
     </property>
    </widget>
@@ -42,9 +42,12 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>401</width>
-      <height>101</height>
+      <width>601</width>
+      <height>191</height>
      </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>true</bool>
     </property>
    </widget>
   </widget>
@@ -53,8 +56,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>463</width>
-     <height>28</height>
+     <width>661</width>
+     <height>26</height>
     </rect>
    </property>
   </widget>

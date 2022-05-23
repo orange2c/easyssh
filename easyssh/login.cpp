@@ -25,7 +25,7 @@ login::~login()
 
 void login::connect_success()
 {
-    MainCmd *mcmd = new MainCmd();
+    MainCmd *mcmd = new MainCmd(ssh);
     mcmd->show();
     this->close();
 }
@@ -37,12 +37,8 @@ void login::connect_error()
 
 void login::on_pushButton_released()
 {
-
     ssh->login( ui->Edit_ip->toPlainText(), ui->Edit_user->toPlainText(), ui->Edit_password->toPlainText() );
-
     ui->pushButton->setEnabled(false);
-
-
-
 }
+
 
