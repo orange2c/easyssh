@@ -10,14 +10,17 @@ Shadow::Shadow(QObject *parent) : QObject(parent)
 
 void Shadow::ssh_message(QString text)
 {
-    save_text.append( text );
-    emit show( save_text, true );
+    save_history.append( save_result );
+//    save_result.clear();
+    save_result.append( text );
+    emit show( save_result, true );
+    qDebug("ssh message 新消息");
 }
 void Shadow::change_pos( int pos )
 {
 
 }
-void Shadow::change_text( QString &text )
+void Shadow::change_text( QString text )
 {
 
 }

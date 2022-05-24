@@ -81,29 +81,14 @@ void PageCmd::on_Button1_clicked()
     ssh->write("\n");
 }
 
-void PageCmd::on_Edit_write_textChanged()
+void PageCmd::on_Edit_show_textChanged()
 {
-    QString data = ui->Edit_write->toPlainText();
-    QTextCursor docCursor = ui->Edit_write->textCursor();
-    int pos = docCursor.position();
-    qDebug("位置pos=%d", pos);
-    if( cmd_text.count() < data.count() && pos > last_cmd_pos ) //有新增数据
+//    emit shadow->change_text( ui->Edit_show->toPlainText() );
+    QString now_cmd = ui->Edit_show->toPlainText();
+    if( now_cmd.count() > cmd_text )
     {
-        QString new_data = data.mid( last_cmd_pos, (pos-last_cmd_pos) );
-        qDebug("检测到新数据pos=%s", qPrintable( new_data ));
-        ssh->write( new_data );
-        if( new_data.at( new_data.count()-1 ) == '\n' )
-        {
-            ui->Edit_write->clear();
-            qDebug("回车");
-
-            cmd_text.clear();
-            last_cmd_pos = 0;
-            return;
-        }
+        qDebug("新增");
     }
-
-    cmd_text = data;
-    last_cmd_pos = pos;
-
 }
+
+
