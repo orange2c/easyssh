@@ -27,6 +27,8 @@ private slots:
 
     void on_Edit_write_textChanged();
 
+    void on_Edit_write_cursorPositionChanged();
+
 private:
     Ui::PageCmd *ui;
 

@@ -116,3 +116,39 @@ void PageCmd::on_Edit_write_textChanged()
     last_cmd_pos = pos;
 
 }
+
+void PageCmd::on_Edit_write_cursorPositionChanged()
+{
+    QString cmd_data = ui->Edit_write->toPlainText();
+    QTextCursor docCursor = ui->Edit_write->textCursor();
+    int pos = docCursor.position();
+
+    if( last_cmd_text.count() < cmd_data.count() && pos > last_cmd_pos ) //有新增数据
+        return;//由于数据新增导致触发光标移动，过滤掉
+    if( last_cmd_text.count() > cmd_data.count() && pos < last_cmd_pos )
+        return;//由于数据删除导致触发光标移动，过滤掉
+
+    if( pos > last_cmd_pos ) //向右移动
+    {
+        QByteArray byte;
+        byte.append( 39 );
+        QString char_move( byte );
+        int move_count = pos - last_cmd_pos ;
+        for( ; move_count >0; move_count-- )
+        {
+            ssh->write( char_move );
+        }
+    }
+    if( pos < last_cmd_pos ) //向左移动
+    {
+        QByteArray byte;
+        byte.append( 37 );
+        QString char_move( byte );
+        int move_count = last_cmd_pos - pos ;
+        for( ; move_count >0; move_count-- )
+        {
+            ssh->write( char_move );
+        }
+    }
+    last_cmd_pos = pos;
+}
