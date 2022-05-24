@@ -7,7 +7,9 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
     ssh( p_ssh )
 {
     ui->setupUi(this);
-    connect( ssh, SIGNAL(shell_output(QString)), SLOT(shell_output(QString)) );
+    shadow = new Shadow();
+    connect( ssh, SIGNAL(shell_output(QString)), shadow, SLOT(ssh_message(QString)) );
+    connect( shadow, SIGNAL(show(QString&,bool)), SLOT(update_cmd(QString&,bool)) );
 }
 
 PageCmd::~PageCmd()
@@ -58,7 +60,13 @@ void PageCmd::shell_output( QString data )
     ui->Edit_cmd->insertPlainText(data);
     ui->Edit_cmd->moveCursor(QTextCursor::End);
 }
-
+void PageCmd::update_cmd(QString &text, bool to_end)
+{
+    ui->Edit_cmd->clear();
+    ui->Edit_cmd->insertPlainText(text);
+    if( to_end )
+        ui->Edit_cmd->moveCursor(QTextCursor::End);
+}
 
 void PageCmd::on_Button1_clicked()
 {

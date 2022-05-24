@@ -12,12 +12,14 @@ SOURCES += \
     main.cpp \
     login.cpp \
     ssh.cpp \
-    pagecmd.cpp
+    pagecmd.cpp \
+    shadow.cpp
 
 HEADERS += \
     login.h \
     ssh.h \
-    pagecmd.h
+    pagecmd.h \
+    shadow.h
 
 FORMS += \
     login.ui \
