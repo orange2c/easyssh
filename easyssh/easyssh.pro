@@ -11,17 +11,17 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     login.cpp \
-    maincmd.cpp \
-    ssh.cpp
+    ssh.cpp \
+    pagecmd.cpp
 
 HEADERS += \
     login.h \
-    maincmd.h \
-    ssh.h
+    ssh.h \
+    pagecmd.h
 
 FORMS += \
     login.ui \
-    maincmd.ui
+    pagecmd.ui
 
 TRANSLATIONS += \
     easyssh_zh_CN.ts

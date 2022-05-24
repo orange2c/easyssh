@@ -25,7 +25,7 @@ login::~login()
 
 void login::connect_success()
 {
-    MainCmd *mcmd = new MainCmd(ssh);
+    PageCmd *mcmd = new PageCmd(ssh);
     mcmd->show();
     this->close();
 }

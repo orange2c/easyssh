@@ -2,7 +2,7 @@
 #define LOGIN_H
 
 #include <QDialog>
-#include "maincmd.h"
+#include "pagecmd.h"
 #include "ssh.h"
 
 QT_BEGIN_NAMESPACE

@@ -1,53 +1,63 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainCmd</class>
- <widget class="QMainWindow" name="MainCmd">
+ <class>PageCmd</class>
+ <widget class="QMainWindow" name="PageCmd">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>661</width>
-    <height>420</height>
+    <width>717</width>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="Button1">
-    <property name="geometry">
-     <rect>
-      <x>240</x>
-      <y>330</y>
-      <width>89</width>
-      <height>25</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>PushButton</string>
-    </property>
-   </widget>
    <widget class="QTextEdit" name="Edit_cmd">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>210</y>
-      <width>601</width>
-      <height>91</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="Edit_show">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
       <y>20</y>
-      <width>601</width>
+      <width>501</width>
       <height>191</height>
      </rect>
     </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
+   </widget>
+   <widget class="QPushButton" name="Button1">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>220</y>
+      <width>101</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>功能1</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Button2">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>220</y>
+      <width>101</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>功能2</string>
+    </property>
+   </widget>
+   <widget class="QTextBrowser" name="textBrowser">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>230</y>
+      <width>256</width>
+      <height>192</height>
+     </rect>
     </property>
    </widget>
   </widget>
@@ -56,7 +66,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>661</width>
+     <width>717</width>
      <height>26</height>
     </rect>
    </property>

@@ -1,5 +1,5 @@
-#ifndef MAINCMD_H
-#define MAINCMD_H
+#ifndef PAGECMD_H
+#define PAGECMD_H
 
 #include <QMainWindow>
 #include <QKeyEvent>
@@ -7,28 +7,23 @@
 #include "ssh.h"
 
 namespace Ui {
-class MainCmd;
+class PageCmd;
 }
 
-class MainCmd : public QMainWindow
+class PageCmd : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainCmd( SSH *p_ssh, QWidget *parent = nullptr );
-    ~MainCmd();
+    explicit PageCmd( SSH *p_ssh, QWidget *parent = 0);
+    ~PageCmd();
 
 private slots:
-    void on_Edit_cmd_selectionChanged();
-    void on_Edit_2_cursorPositionChanged();
-    void on_Edit_cmd_cursorPositionChanged();
-
     void shell_output( QString data );
-
     void on_Button1_clicked();
 
-protected:
-    Ui::MainCmd *ui;
+private:
+    Ui::PageCmd *ui;
 
     SSH *ssh;
 
@@ -39,4 +34,4 @@ protected:
     void keyPressEvent(QKeyEvent *event);
 };
 
-#endif // MAINCMD_H
+#endif // PAGECMD_H
