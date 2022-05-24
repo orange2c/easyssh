@@ -5,7 +5,6 @@
 #include <QKeyEvent>
 #include <QTextList>
 #include "ssh.h"
-#include "shadow.h"
 
 namespace Ui {
 class PageCmd;
@@ -32,15 +31,12 @@ private:
     Ui::PageCmd *ui;
 
     SSH *ssh;
-    Shadow *shadow;
 
     int last_key = 0; //按下组合键时会被拆成多次调用
-    int last_pos = 0;
     int last_block_number = 0;
 
-    QString cmd_text; //存储当前窗口应该显示的内容
-
-    int last_cmd_pos = 0;
+    QString last_cmd_text; //存储文本框上一次存储的数据
+    int last_cmd_pos = 0;  //存储上一次上一次的光标位置
 
 
 

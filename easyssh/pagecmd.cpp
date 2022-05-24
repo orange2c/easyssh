@@ -7,13 +7,9 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
     ssh( p_ssh )
 {
     ui->setupUi(this);
-    shadow = new Shadow();
-//    connect( ssh, SIGNAL(shell_output(QString)), shadow, SLOT(ssh_message(QString)) );
     connect( ssh, SIGNAL(shell_output(QString)), SLOT(shell_output(QString)) );
 
-    connect( shadow, SIGNAL(show(QString&,bool)), SLOT(update_cmd(QString&,bool)) );
-//    connect( shadow, SIGNAL(ssh_write(QString)), SLOT(ssh_write(QString)) );
-}
+ }
 
 PageCmd::~PageCmd()
 {
@@ -83,13 +79,13 @@ void PageCmd::on_Button1_clicked()
 
 void PageCmd::on_Edit_write_textChanged()
 {
-    QString data = ui->Edit_write->toPlainText();
+    QString cmd_data = ui->Edit_write->toPlainText();
     QTextCursor docCursor = ui->Edit_write->textCursor();
     int pos = docCursor.position();
-    qDebug("位置pos=%d", pos);
-    if( cmd_text.count() < data.count() && pos > last_cmd_pos ) //有新增数据
+    qDebug("lastpos=%d,pos=%d", last_cmd_pos, pos);
+    if( last_cmd_text.count() < cmd_data.count() && pos > last_cmd_pos ) //有新增数据
     {
-        QString new_data = data.mid( last_cmd_pos, (pos-last_cmd_pos) );
+        QString new_data = cmd_data.mid( last_cmd_pos, (pos-last_cmd_pos) );
         qDebug("检测到新数据pos=%s", qPrintable( new_data ));
         ssh->write( new_data );
         if( new_data.at( new_data.count()-1 ) == '\n' )
@@ -97,13 +93,26 @@ void PageCmd::on_Edit_write_textChanged()
             ui->Edit_write->clear();
             qDebug("回车");
 
-            cmd_text.clear();
+            last_cmd_text.clear();
             last_cmd_pos = 0;
             return;
         }
     }
+    if( last_cmd_text.count() > cmd_data.count() && pos < last_cmd_pos )//有数据被删除
+    {
 
-    cmd_text = data;
+        QByteArray byte;
+        byte.append( 127 );
+        QString char_del( byte );
+        int del_count = last_cmd_pos - pos;
+        for( ; del_count >0; del_count-- )
+        {
+            qDebug("发送删除");
+            ssh->write( char_del );
+        }
+    }
+
+    last_cmd_text = cmd_data;
     last_cmd_pos = pos;
 
 }
