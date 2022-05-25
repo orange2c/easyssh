@@ -32,7 +32,7 @@ private slots:
     void shell_output( QString data );
     void on_Button1_clicked();
     void update_cmd( QString &text, bool to_end );
-    void ssh_write( QString cmd );
+//    void ssh_write( QString cmd );
 
     void on_Edit_write_textChanged();
     void on_Edit_write_cursorPositionChanged();

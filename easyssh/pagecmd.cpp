@@ -70,10 +70,10 @@ void PageCmd::update_cmd(QString &text, bool to_end)
     if( to_end )
         ui->Edit_show->moveCursor(QTextCursor::End);
 }
-void PageCmd::ssh_write( QString cmd )
-{
-    ssh->write( cmd );
-}
+//void PageCmd::ssh_write( QString cmd )
+//{
+//    ssh->write( cmd );
+//}
 
 void PageCmd::on_Button1_clicked()
 {
@@ -105,7 +105,8 @@ void PageCmd::init_edit()
 
 }
 
-void PageCmd::on_Edit_write_textChanged() //输入框文本变动事件
+//输入框文本变动事件
+void PageCmd::on_Edit_write_textChanged()
 {
     if( is_init_deit )
         return;
@@ -153,6 +154,7 @@ void PageCmd::on_Edit_write_textChanged() //输入框文本变动事件
 
 }
 
+//输入框光标移动事件
 void PageCmd::on_Edit_write_cursorPositionChanged()
 {
     if( is_init_deit )
@@ -161,6 +163,8 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
     QString cmd_data = ui->Edit_write->toPlainText();
     if( last_cmd_text.count() != cmd_data.count())
         return; //由于文本变动导致的光标移动，过滤掉
+    if( cmd_data.count() == 0 )
+        return; //由于文本框clear触发，
 
     QTextCursor docCursor = ui->Edit_write->textCursor();
     int pos = docCursor.position();
@@ -169,13 +173,13 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
     key_byte.append( 0x1b );
     key_byte.append( 0x5b );
     int move_count = 0 ;//左右方向可以设置次数
-    if( pos == 0 || (pos==1 && last_cmd_pos>2 )  )
+    if( (pos==0 && last_cmd_pos>=1 )  )
     {
         key_byte.append( 'A' );//转义序列
         move_count = 1 ;
         ui->log->append( "方向键上" );
     }
-    else if( pos == cmd_data.count() )
+    else if( pos==cmd_data.count() && pos!=0 )
     {
         key_byte.append( 'B' );//转义序列
         move_count = 1 ;
