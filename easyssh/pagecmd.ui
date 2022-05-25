@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>817</width>
+    <width>1175</width>
     <height>463</height>
    </rect>
   </property>
@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
+      <y>30</y>
       <width>501</width>
       <height>181</height>
      </rect>
@@ -66,11 +66,60 @@
    <widget class="QTextEdit" name="log">
     <property name="geometry">
      <rect>
+      <x>270</x>
+      <y>300</y>
+      <width>251</width>
+      <height>101</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="ascii">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>290</y>
+      <width>251</width>
+      <height>121</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="Edit_show2">
+    <property name="geometry">
+     <rect>
       <x>550</x>
       <y>30</y>
-      <width>251</width>
-      <height>251</height>
+      <width>501</width>
+      <height>181</height>
      </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>10</y>
+      <width>72</width>
+      <height>15</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>未过滤</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>211</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>经过关键字过滤</string>
     </property>
    </widget>
    <zorder>Edit_write</zorder>
@@ -78,13 +127,17 @@
    <zorder>Button1</zorder>
    <zorder>Button2</zorder>
    <zorder>log</zorder>
+   <zorder>ascii</zorder>
+   <zorder>Edit_show2</zorder>
+   <zorder>label</zorder>
+   <zorder>label_2</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>817</width>
+     <width>1175</width>
      <height>26</height>
     </rect>
    </property>

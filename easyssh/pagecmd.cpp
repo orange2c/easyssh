@@ -21,7 +21,6 @@ PageCmd::~PageCmd()
 
 void PageCmd::keyPressEvent(QKeyEvent *event)
 {
-
     qDebug("last=%d,now=%d", last_key, event->key());
     int k = event->key();
     int value = -1;
@@ -53,27 +52,75 @@ void PageCmd::keyPressEvent(QKeyEvent *event)
     if( value > -1 )
     {
         qb.append(value);
-//        ui->Edit_show->insertPlainText(qb.data());
         ssh->write(qb.data());
     }
     last_key = k;
 }
+void PageCmd::eshow_pos_change(int relative)
+{
+    QString cmd_data = ui->Edit_write->toPlainText();
+    QTextCursor docCursor = ui->Edit_write->textCursor();
+    int now_pos = docCursor.position();  //获取当前pos位置
+    now_pos += relative;
+    if( now_pos < 0 ) now_pos = 0;
+    if( now_pos > cmd_data.count() ) now_pos = cmd_data.count();
+    QTextCursor move = ui->Edit_show->textCursor();
+    move.setPosition( now_pos );
+    ui->Edit_show->setTextCursor( move );
+    QString  HWORD("H");
+    ui->Edit_show->insertPlainText( HWORD );
+
+}
+
+//接收ssh信息的槽
 void PageCmd::shell_output( QString data )
 {
-    ui->Edit_show->insertPlainText(data);
+    QByteArray bytes = data.toUtf8() ;
+    QString correction;
+    for( int i = 0; i<data.count(); i++ )
+    {
+
+        switch( bytes.at(i) ) //
+        {
+        case 7: //7，振铃
+            continue;
+        case 8: //8，退格（方向键左）
+            eshow_pos_change(-1);
+            continue;
+        case 0x1b: //ESC 一堆转义序列的起始
+            if( bytes.at(i+1) == 0x5b)
+            {
+                if( bytes.at(i+2) == 0x4b ) //删除
+                {
+                    i+=2;
+
+                }
+
+            }
+            else
+                break; //直接退出
+            continue;
+
+
+        }
+
+        correction.append( bytes.at(i) );
+    }
+
+    ui->Edit_show->insertPlainText(correction);
     ui->Edit_show->moveCursor(QTextCursor::End);
+
+    ui->Edit_show2->insertPlainText(data);
+    ui->Edit_show2->moveCursor(QTextCursor::End);
+
+    QByteArray byte = data.toUtf8();
+    for( int i=0; i< byte.count(); i++ )
+    {
+        ui->ascii->insertPlainText( "十进制：:"+ QString::number( byte.at(i) )+ "\tHex:"+ QString::number( byte.at(i), 16 )+ '\n' );
+    }
+    ui->ascii->moveCursor(QTextCursor::End);
+
 }
-void PageCmd::update_cmd(QString &text, bool to_end)
-{
-    ui->Edit_show->clear();
-    ui->Edit_show->insertPlainText(text);
-    if( to_end )
-        ui->Edit_show->moveCursor(QTextCursor::End);
-}
-//void PageCmd::ssh_write( QString cmd )
-//{
-//    ssh->write( cmd );
-//}
 
 void PageCmd::on_Button1_clicked()
 {
@@ -198,6 +245,7 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
         key_byte.append( 'D' );//转义序列
         move_count = last_cmd_pos - pos ;
         ui->log->append( "方向键左" );
+
     }
      else //如果不是四个按键，则直接退出
         return;
