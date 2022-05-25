@@ -131,7 +131,9 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
     if( pos > last_cmd_pos ) //向右移动
     {
         QByteArray byte;
-        byte.append( 39 );
+        byte.append( 0x1b );
+        byte.append( 0x5b );
+        byte.append( 'C' );//转义序列
         QString char_move( byte );
         int move_count = pos - last_cmd_pos ;
         for( ; move_count >0; move_count-- )
@@ -142,7 +144,9 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
     if( pos < last_cmd_pos ) //向左移动
     {
         QByteArray byte;
-        byte.append( 37 );
+        byte.append( 0x1b );
+        byte.append( 0x5b );
+        byte.append( 'D' );//转义序列
         QString char_move( byte );
         int move_count = last_cmd_pos - pos ;
         for( ; move_count >0; move_count-- )
