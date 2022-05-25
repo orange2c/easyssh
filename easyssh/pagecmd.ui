@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>520</width>
+    <width>817</width>
     <height>463</height>
    </rect>
   </property>
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>20</y>
       <width>501</width>
-      <height>191</height>
+      <height>181</height>
      </rect>
     </property>
     <property name="readOnly">
@@ -63,13 +63,28 @@
      </rect>
     </property>
    </widget>
+   <widget class="QTextEdit" name="log">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>30</y>
+      <width>251</width>
+      <height>251</height>
+     </rect>
+    </property>
+   </widget>
+   <zorder>Edit_write</zorder>
+   <zorder>Edit_show</zorder>
+   <zorder>Button1</zorder>
+   <zorder>Button2</zorder>
+   <zorder>log</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>520</width>
+     <width>817</width>
      <height>26</height>
     </rect>
    </property>
