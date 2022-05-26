@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QTextEdit>
+#include <QTextBlock>
 
 class ECUROSR : public QObject
 {
@@ -13,9 +14,10 @@ public:
     void move_save();  //将光标移动到保存的位置
     void move_end();  //移动到末尾
     void move_rel( int row, int column ); //相对位置移动，如+1 -3
+    void move_rel( int pos ); //相对位置移动，如+1 -3
 
-    void set_fence_mode( int mode ); //围栏模式，限制光标只能在特定区域移动，超出强制返回
-    void signal_enable( bool flag ); //设置是否启用信号，不启用，则本类依然接收事件进行处理
+//    void set_fence_mode( int mode ); //围栏模式，限制光标只能在特定区域移动，超出强制返回
+    void signal_enable( bool flag ); //设置是否发送光标变动事件信号
 
 
 protected:
@@ -27,6 +29,7 @@ protected:
     int save_row[2] ;
     int save_col[2] ;
     int save_pos = 0 ;
+    int moset_right = 0 ; //记录最近编辑到达的最右一个字符
 
     inline void save_rc( int row, int column ); //将数据保存，并作左移
 

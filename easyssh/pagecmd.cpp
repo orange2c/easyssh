@@ -13,7 +13,7 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
 
     ecursor = new ECUROSR( ui->Edit_show );
     connect( ecursor, SIGNAL(cursor_change(int,int,int)), SLOT(ecursor_change(int,int,int)) );
-    ecursor->signal_enable( false );
+    ecursor->signal_enable( true );
  }
 
 PageCmd::~PageCmd()
@@ -219,6 +219,7 @@ void PageCmd::init_edit()
 //输入框文本变动事件
 void PageCmd::on_Edit_write_textChanged()
 {
+
     if( is_init_deit )
         return;
     ui->log->append("输入框文本变动事件 发生");
@@ -374,9 +375,19 @@ void PageCmd::ecursor_change( int row, int column, int pos )
 
     }
 
-     QString char_move( key_byte );
-     for( ; move_count >0; move_count-- )
-     {
-         ssh->write( char_move );
-     }
+    if( row != 0 ) //限制光标只能在这一行内
+    {
+        ecursor->signal_enable( false );
+        ecursor->move_rel( -pos );
+        ecursor->signal_enable( true );
+    }
+
+
+    QString char_move( key_byte );
+    for( ; move_count >0; move_count-- )
+    {
+     ssh->write( char_move );
+    }
+
+
 }
