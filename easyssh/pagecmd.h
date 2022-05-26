@@ -6,6 +6,7 @@
 #include <QTextList>
 #include <QTextCodec>
 #include "ssh.h"
+#include "ecurosr.h"
 
 namespace Ui {
 class PageCmd;
@@ -20,6 +21,10 @@ public:
     ~PageCmd();
 
 protected:
+    ECUROSR *ecursor;
+
+
+
     int left_todel_count = 0; //ssh命令输入时，如果按左键，则下次会把右边几个字母也返回
     int last_key = 0; //按下组合键时会触发两次按键事件
     QString cmd_show_text; //存储展示框内需要展示的字符串
@@ -43,6 +48,7 @@ private slots:
 
     void on_Edit_write_textChanged();
     void on_Edit_write_cursorPositionChanged();
+    void ecursor_change( int row, int column, int pos );
 
 private:
     Ui::PageCmd *ui;

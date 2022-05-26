@@ -11,11 +11,15 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
     init_edit();
     ui->Edit_write->setFocus();
 
+    ecursor = new ECUROSR( ui->Edit_show );
+    connect( ecursor, SIGNAL(cursor_change(int,int,int)), SLOT(ecursor_change(int,int,int)) );
+    ecursor->signal_enable( false );
  }
 
 PageCmd::~PageCmd()
 {
     delete ui;
+    delete ecursor;
 }
 
 
@@ -103,21 +107,25 @@ void PageCmd::eshow_backspace( int count )
 }
 void PageCmd::eshow_delete( int count )
 {
+    ui->log->append( "delete删除开始" );
+
     QString show_data = ui->Edit_show->toPlainText();
     QTextCursor docCursor = ui->Edit_show->textCursor();
     int pos = docCursor.position() ;
-    show_data.remove( pos+1, count );
+    show_data.remove( pos, count );
 
     ui->Edit_show->clear();
     ui->Edit_show->insertPlainText( show_data );
     QTextCursor newCursor = ui->Edit_show->textCursor();
-    newCursor.setPosition( pos  );
+    newCursor.setPosition( pos );
     ui->Edit_show->setTextCursor( newCursor );
 }
 
 //接收ssh信息的槽
 void PageCmd::shell_output( QString data )
 {
+    ecursor->signal_enable( false );
+
     for( int i = 0; i<data.count(); i++ )
     {
         switch( data.at(i).toLatin1() ) //
@@ -156,7 +164,11 @@ void PageCmd::shell_output( QString data )
             continue;
 
         }
-
+        if( left_todel_count >0 )
+        {
+            eshow_delete( left_todel_count );
+            left_todel_count = 0;
+        }
         ui->Edit_show->insertPlainText( data.at(i) );
     }
 
@@ -170,7 +182,7 @@ void PageCmd::shell_output( QString data )
         ui->ascii->insertPlainText( "十进制:"+ QString::number( byte.at(i) )+ "  Hex:"+ QString::number( byte.at(i), 16 )+ ":"+byte.at(i)+ '\n' );
     }
     ui->ascii->moveCursor(QTextCursor::End);
-
+    ecursor->signal_enable( true );
 }
 
 void PageCmd::on_Button1_clicked()
@@ -311,6 +323,7 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
         key_byte.append( 'D' );//转义序列
         move_count = last_cmd_pos - pos ;
         ui->log->append( "方向键左" );
+        left_todel_count ++ ;
 
     }
      else //如果不是四个按键，则直接退出
@@ -322,4 +335,48 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
          ssh->write( char_move );
      }
     last_cmd_pos = pos;
+}
+
+void PageCmd::ecursor_change( int row, int column, int pos )
+{
+    qDebug("相对移动：r:%d c:%d pos:%d", row, column, pos );
+    QByteArray key_byte; //方向键的转义序列共三位，前两位固定，第三位表示方向
+    key_byte.append( 0x1b );
+    key_byte.append( 0x5b );
+    int move_count = 0 ;//左右方向可以设置次数
+
+    if( row<0 && pos<-1 )
+    {
+        key_byte.append( 'A' );//转义序列
+        move_count = 1 ;
+        ui->log->append( "方向键上" );
+    }
+    if( row>0 && pos>1 )
+    {
+        key_byte.append( 'B' );//转义序列
+        move_count = 1 ;
+        ui->log->append( "方向键下" );
+    }
+    //方向键向右移动
+    if( column > 0 )
+    {
+        key_byte.append( 'C' );//转义序列
+        move_count = column ;
+        ui->log->append( "方向键右" );
+    }
+    //方向键向左移动
+    if( column < 0 )
+    {
+        key_byte.append( 'D' );//转义序列
+        move_count = -column ;
+        ui->log->append( "方向键左" );
+        left_todel_count ++ ;
+
+    }
+
+     QString char_move( key_byte );
+     for( ; move_count >0; move_count-- )
+     {
+         ssh->write( char_move );
+     }
 }
