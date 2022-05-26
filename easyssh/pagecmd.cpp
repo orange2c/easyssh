@@ -58,29 +58,25 @@ void PageCmd::keyPressEvent(QKeyEvent *event)
 }
 void PageCmd::eshow_pos_change(int relative)
 {
-    QString cmd_data = ui->Edit_write->toPlainText();
-    QTextCursor docCursor = ui->Edit_write->textCursor();
+    QString cmd_data = ui->Edit_show->toPlainText();
+    QTextCursor docCursor = ui->Edit_show->textCursor();
     int now_pos = docCursor.position();  //获取当前pos位置
+    ui->log->append( "当前pos位置："+ QString::number(now_pos) );
     now_pos += relative;
     if( now_pos < 0 ) now_pos = 0;
     if( now_pos > cmd_data.count() ) now_pos = cmd_data.count();
     QTextCursor move = ui->Edit_show->textCursor();
     move.setPosition( now_pos );
     ui->Edit_show->setTextCursor( move );
-    QString  HWORD("H");
-    ui->Edit_show->insertPlainText( HWORD );
-
 }
 
 //接收ssh信息的槽
 void PageCmd::shell_output( QString data )
 {
-    QByteArray bytes = data.toUtf8() ;
     QString correction;
     for( int i = 0; i<data.count(); i++ )
     {
-
-        switch( bytes.at(i) ) //
+        switch( data.at(i).toLatin1() ) //
         {
         case 7: //7，振铃
             continue;
@@ -88,11 +84,12 @@ void PageCmd::shell_output( QString data )
             eshow_pos_change(-1);
             continue;
         case 0x1b: //ESC 一堆转义序列的起始
-            if( bytes.at(i+1) == 0x5b)
+            if( data.at(i+1).toLatin1() == 0x5b)
             {
-                if( bytes.at(i+2) == 0x4b ) //删除
+                if( data.at(i+2).toLatin1() == 0x4b ) //删除
                 {
                     i+=2;
+
 
                 }
 
@@ -104,10 +101,10 @@ void PageCmd::shell_output( QString data )
 
         }
 
-        correction.append( bytes.at(i) );
+        correction.append( data.at(i) );
     }
 
-    ui->Edit_show->insertPlainText(correction);
+    ui->Edit_show->insertPlainText( correction );
     ui->Edit_show->moveCursor(QTextCursor::End);
 
     ui->Edit_show2->insertPlainText(data);
@@ -116,7 +113,7 @@ void PageCmd::shell_output( QString data )
     QByteArray byte = data.toUtf8();
     for( int i=0; i< byte.count(); i++ )
     {
-        ui->ascii->insertPlainText( "十进制：:"+ QString::number( byte.at(i) )+ "\tHex:"+ QString::number( byte.at(i), 16 )+ '\n' );
+        ui->ascii->insertPlainText( "十进制:"+ QString::number( byte.at(i) )+ "  Hex:"+ QString::number( byte.at(i), 16 )+ ":"+byte.at(i)+ '\n' );
     }
     ui->ascii->moveCursor(QTextCursor::End);
 
