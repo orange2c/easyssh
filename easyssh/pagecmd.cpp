@@ -88,19 +88,31 @@ void PageCmd::eshow_row_change(int relative)
 
 
 }
-void PageCmd::eshow_backspace()
+void PageCmd::eshow_backspace( int count )
 {
     QString show_data = ui->Edit_show->toPlainText();
     QTextCursor docCursor = ui->Edit_show->textCursor();
     int pos = docCursor.position() ;
-    show_data.remove( pos, 1 );
+    show_data.remove( pos, count );
 
     ui->Edit_show->clear();
     ui->Edit_show->insertPlainText( show_data );
     QTextCursor newCursor = ui->Edit_show->textCursor();
     newCursor.setPosition( pos + 1 );
     ui->Edit_show->setTextCursor( newCursor );
+}
+void PageCmd::eshow_delete( int count )
+{
+    QString show_data = ui->Edit_show->toPlainText();
+    QTextCursor docCursor = ui->Edit_show->textCursor();
+    int pos = docCursor.position() ;
+    show_data.remove( pos+1, count );
 
+    ui->Edit_show->clear();
+    ui->Edit_show->insertPlainText( show_data );
+    QTextCursor newCursor = ui->Edit_show->textCursor();
+    newCursor.setPosition( pos  );
+    ui->Edit_show->setTextCursor( newCursor );
 }
 
 //接收ssh信息的槽
@@ -163,12 +175,13 @@ void PageCmd::shell_output( QString data )
 
 void PageCmd::on_Button1_clicked()
 {
-    QByteArray byte;
-    byte.append( 0x1b );
-    byte.append( 0x5b );
-    byte.append( 'A' );//转义序列
-    QString char_move( byte );
-    ssh->write( char_move );
+//    QByteArray byte;
+//    byte.append( 0x1b );
+//    byte.append( 0x5b );
+//    byte.append( 'A' );//转义序列
+//    QString char_move( byte );
+//    ssh->write( char_move );
+    eshow_row_change(-1);
 }
 
 void PageCmd::init_edit()
@@ -225,9 +238,23 @@ void PageCmd::on_Edit_write_textChanged()
     {
 
         QByteArray byte;
-        byte.append( 127 );
+        byte.append( 0x8 );
         QString char_del( byte );
         int del_count = last_cmd_pos - pos;
+        for( ; del_count >0; del_count-- )
+        {
+            qDebug("发送删除");
+            ssh->write( char_del );
+        }
+    }
+    //有数据被delete删除
+    if( last_cmd_text.count() > cmd_data.count() && pos == last_cmd_pos )
+    {
+
+        QByteArray byte;
+        byte.append( 127 );
+        QString char_del( byte );
+        int del_count = last_cmd_text.count() - cmd_data.count();
         for( ; del_count >0; del_count-- )
         {
             qDebug("发送删除");
