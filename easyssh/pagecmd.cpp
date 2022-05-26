@@ -56,6 +56,9 @@ void PageCmd::keyPressEvent(QKeyEvent *event)
     }
     last_key = k;
 }
+
+
+
 void PageCmd::eshow_pos_change(int relative)
 {
     QString cmd_data = ui->Edit_show->toPlainText();
@@ -64,48 +67,87 @@ void PageCmd::eshow_pos_change(int relative)
     ui->log->append( "当前pos位置："+ QString::number(now_pos) );
     now_pos += relative;
     if( now_pos < 0 ) now_pos = 0;
-    if( now_pos > cmd_data.count() ) now_pos = cmd_data.count();
+    if( now_pos > cmd_data.count() ) now_pos = cmd_data.count() ;
     QTextCursor move = ui->Edit_show->textCursor();
     move.setPosition( now_pos );
     ui->Edit_show->setTextCursor( move );
+}
+void PageCmd::eshow_row_change(int relative)
+{
+    QTextDocument *doc = ui->Edit_show->document();
+    QTextCursor docCursor = ui->Edit_show->textCursor();
+
+    int row_now = docCursor.blockNumber();
+    row_now += relative;
+    if( row_now < 0 ) row_now = 0;
+    if( row_now > doc->blockCount() ) row_now = doc->blockCount();
+
+
+    QTextBlock block = doc->findBlockByNumber(row_now);
+    ui->Edit_show->setTextCursor( QTextCursor(block) );
+
+
+}
+void PageCmd::eshow_backspace()
+{
+    QString show_data = ui->Edit_show->toPlainText();
+    QTextCursor docCursor = ui->Edit_show->textCursor();
+    int pos = docCursor.position() ;
+    show_data.remove( pos, 1 );
+
+    ui->Edit_show->clear();
+    ui->Edit_show->insertPlainText( show_data );
+    QTextCursor newCursor = ui->Edit_show->textCursor();
+    newCursor.setPosition( pos + 1 );
+    ui->Edit_show->setTextCursor( newCursor );
+
 }
 
 //接收ssh信息的槽
 void PageCmd::shell_output( QString data )
 {
-    QString correction;
     for( int i = 0; i<data.count(); i++ )
     {
         switch( data.at(i).toLatin1() ) //
         {
-        case 7: //7，振铃
+        case 0x7: //7，振铃
+            ui->Edit_show->moveCursor(QTextCursor::End);
             continue;
-        case 8: //8，退格（方向键左）
+        case 0x8: //8，退格（方向键左）
             eshow_pos_change(-1);
             continue;
+        case '\r':
+            if( data.at(i+1).toLatin1() == '\n' )
+            {
+                i += 2;
+                ui->Edit_show->insertPlainText( "\n" );
+                continue;
+            }
+
         case 0x1b: //ESC 一堆转义序列的起始
             if( data.at(i+1).toLatin1() == 0x5b)
             {
+                if( data.at(i+2).toLatin1() == 'C' ) //向右移动一格
+                {
+                    i+=3;
+                    eshow_pos_change(+1);
+                    continue;
+                }
                 if( data.at(i+2).toLatin1() == 0x4b ) //删除
                 {
-                    i+=2;
-
-
+                    i+=3;
+                    eshow_backspace();
                 }
-
             }
             else
                 break; //直接退出
             continue;
 
-
         }
 
-        correction.append( data.at(i) );
+        ui->Edit_show->insertPlainText( data.at(i) );
     }
 
-    ui->Edit_show->insertPlainText( correction );
-    ui->Edit_show->moveCursor(QTextCursor::End);
 
     ui->Edit_show2->insertPlainText(data);
     ui->Edit_show2->moveCursor(QTextCursor::End);
@@ -171,11 +213,11 @@ void PageCmd::on_Edit_write_textChanged()
         if( new_data.at( new_data.count()-1 ) == '\n' )
         {
             ui->Edit_write->clear();
+            ui->Edit_show->moveCursor(QTextCursor::End);
             qDebug("回车");
             init_edit();
             return;
         }
-
     }
 
     //有数据被backspace删除
@@ -205,7 +247,7 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
         return; //如果是init_edit在设置预置字符串时触发
 
     QString cmd_data = ui->Edit_write->toPlainText();
-    if( last_cmd_text.count() != cmd_data.count())
+    if( last_cmd_text.count() != cmd_data.count() )
         return; //由于文本变动导致的光标移动，过滤掉
     if( cmd_data.count() == 0 )
         return; //由于文本框clear触发，

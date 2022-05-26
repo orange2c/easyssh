@@ -21,6 +21,7 @@ public:
 
 protected:
     int last_key = 0; //按下组合键时会触发两次按键事件
+    QString cmd_show_text; //存储展示框内需要展示的字符串
     QString last_cmd_text; //存储文本框上一次存储的数据
     int last_cmd_pos = 0;  //存储文本框上一次的光标位置
 
@@ -28,7 +29,11 @@ protected:
     bool is_edit = true; //true，则会把ssh返回值发送到输入框内，false则只发送到展示框
 
     void init_edit(); //清空输入框，填入预置字符，设置各个变量
-    void eshow_pos_change( int relative ); //让show窗口的光标，移动相对位置
+    void eshow_pos_change( int relative ); //让show窗口的光标，左右移动相对位置
+    void eshow_row_change( int relative ); //让show窗口的光标，上下移动相对位置
+
+    void eshow_delete_at( int pos );
+    void eshow_backspace(); //删除当前光标所在前一个字符
 
 private slots:
     void shell_output( QString data );
