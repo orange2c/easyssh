@@ -13,13 +13,15 @@ SOURCES += \
     login.cpp \
     ssh.cpp \
     pagecmd.cpp \
-    ecurosr.cpp
+    ecurosr.cpp \
+    etext.cpp
 
 HEADERS += \
     login.h \
     ssh.h \
     pagecmd.h \
-    ecurosr.h
+    ecurosr.h \
+    etext.h
 
 FORMS += \
     login.ui \

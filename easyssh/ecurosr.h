@@ -11,12 +11,8 @@ class ECUROSR : public QObject
 public:
     explicit ECUROSR( QTextEdit *text_edit, QObject *parent = nullptr);
 
-    void move_save();  //将光标移动到保存的位置
-    void move_end();  //移动到末尾
-    void move_rel( int row, int column ); //相对位置移动，如+1 -3
     void move_rel( int pos ); //相对位置移动，如+1 -3
 
-//    void set_fence_mode( int mode ); //围栏模式，限制光标只能在特定区域移动，超出强制返回
     void signal_enable( bool flag ); //设置是否发送光标变动事件信号
 
 
