@@ -31,7 +31,7 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>320</y>
+      <y>350</y>
       <width>101</width>
       <height>51</height>
      </rect>
@@ -43,8 +43,8 @@
    <widget class="QPushButton" name="Button2">
     <property name="geometry">
      <rect>
-      <x>160</x>
-      <y>320</y>
+      <x>170</x>
+      <y>350</y>
       <width>101</width>
       <height>51</height>
      </rect>
@@ -57,9 +57,9 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>210</y>
+      <y>240</y>
       <width>501</width>
-      <height>41</height>
+      <height>111</height>
      </rect>
     </property>
     <property name="html">
@@ -75,19 +75,19 @@ p, li { white-space: pre-wrap; }
    <widget class="QTextEdit" name="log">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>300</y>
-      <width>251</width>
-      <height>101</height>
+      <x>530</x>
+      <y>240</y>
+      <width>191</width>
+      <height>161</height>
      </rect>
     </property>
    </widget>
    <widget class="QTextEdit" name="ascii">
     <property name="geometry">
      <rect>
-      <x>540</x>
+      <x>740</x>
       <y>230</y>
-      <width>401</width>
+      <width>311</width>
       <height>181</height>
      </rect>
     </property>

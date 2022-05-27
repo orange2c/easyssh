@@ -7,6 +7,7 @@
 #include <QTextCodec>
 #include "ssh.h"
 #include "ecurosr.h"
+#include "etext.h"
 
 namespace Ui {
 class PageCmd;
@@ -22,6 +23,7 @@ public:
 
 protected:
     ECUROSR *ecursor;
+    ETEXT *etext;
 
 
 
@@ -41,6 +43,8 @@ protected:
     void eshow_delete_at( int pos );
     void eshow_backspace( int count = 1 ); //删除当前光标所在前一个字符
     void eshow_delete( int count = 1 ); //删除当前光标所在后一个字符
+
+    void edit_write2show(); //把write窗口的东西搬到show去
 
 private slots:
     void shell_output( QString data );

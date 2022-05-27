@@ -27,6 +27,7 @@ inline void ECUROSR::save_rc(int row, int column)
     save_col[0] = save_col[1];
     save_col[1] = column;
 }
+
 void ECUROSR::signal_enable(bool flag)
 {
     is_signal_enable = flag;
@@ -44,9 +45,13 @@ void ECUROSR::edit_curosr_change()
     //如当前光标col为10，移动到下一行，该行只有3个字符，则光标col为3
     //此时再移动到新一行，该行字符数大于10，则光标col会变成10
 
+    int text_count = Edit->toPlainText().count();
+    if(  (text_count ==save_text_count) && is_signal_enable )
+
     if( is_signal_enable )
         emit cursor_change( save_row[1]-save_row[0], save_col[1]-save_col[0], pos-save_pos );
     save_pos = pos;
+    save_text_count = text_count ;
 }
 
 

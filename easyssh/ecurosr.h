@@ -25,6 +25,7 @@ protected:
     int save_row[2] ;
     int save_col[2] ;
     int save_pos = 0 ;
+    int save_text_count = 0 ; //记录文本大小，如果是因为文本变动导致光标移动，则不发送信号
     int moset_right = 0 ; //记录最近编辑到达的最右一个字符
 
     inline void save_rc( int row, int column ); //将数据保存，并作左移
