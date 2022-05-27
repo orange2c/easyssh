@@ -11,7 +11,7 @@ public:
     explicit ETEXT( QTextEdit *text_edit, QObject *parent = nullptr);
     ~ETEXT();
 
-    void update_start(); //重置当前光标位置，为文本比较的起始
+    void save_now( QString *text = NULL ); //保存当前文本框内容
 
     void signal_enable( bool flag ); //设置是否发送文本变动事件信号
 
@@ -22,9 +22,6 @@ protected:
     QTextDocument *Doc; //指向该文本框内的文本
     QString *save_text = NULL; //保存文本框数据，供发生文本改变时比较
 
-    int block_start = 0;
-    int pos_start = 0; //文本比较时的起始，文本框内字符串太多，为了提高效率必须限定从指定位置开始
-
     bool is_signal_enable = true;
 
 signals:
@@ -34,6 +31,7 @@ signals:
 
 public slots:
     void edit_text_change(); //
+//    void edit_cursor_change(); //主要是记录光标移动来判断是否
 };
 
 #endif // ETEXT_H

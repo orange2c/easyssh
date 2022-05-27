@@ -189,7 +189,7 @@ void PageCmd::shell_output( QString data )
     ui->ascii->moveCursor(QTextCursor::End);
     ecursor->signal_enable( true );
     etext->signal_enable( true );
-    etext->update_start();
+    etext->save_now();
 
 }
 
