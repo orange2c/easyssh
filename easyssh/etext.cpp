@@ -36,51 +36,43 @@ void ETEXT::edit_text_change()
     int now_count = now_text->count();
     int last_count = save_text->count();
 
-    int diff_left = 0;
-
     int now_left = 0;
-    int now_right = now_count-1;
+    int now_right = 0;
     int last_left = 0;
-    int last_right = last_count-1;
+    int last_right = 0;
 
     //last从左往右与now比对是否相同
     //last从右往左与now比对是否相同
-    if( now_count!=0 && last_count!=0 ) //必须两串都不为0
+    if( now_count!=0 && last_count!=0 ) //必须两串大小都不为0
     {
         while( 1 )
         {
             if( now_text->at(now_left) != save_text->at( last_left ) )
                 break;
             now_left++;
+            last_left++;
             if( now_left >= now_count)
                 break;
-            last_left++;
             if( last_left >= last_count)
                 break;
         }
+        int tmp_n ;
+        int tmp_l ;
         while( 1 )
         {
-            if( now_text->at(now_right) != save_text->at( last_right ) )
+            tmp_n = now_count - now_right - 1;
+            tmp_l = last_count - last_right - 1;
+            if( tmp_n < now_left)
                 break;
-            now_right--;
-            if( now_right <= now_left)
+            if( tmp_l < last_left)
                 break;
-            last_right--;
-            if( last_right <= last_left)
+
+            if( now_text->at(tmp_n) != save_text->at(tmp_l) )
                 break;
+
+            now_right++;
+            last_right++;
         }
-//        while( 1 )
-//        {
-//            if( now_text->at(now_right) == save_text->at( last_right ) )
-//            {
-//                now_right--;
-//                if( now_right <= now_left)
-//                    break;
-//                last_right--;
-//                if( last_right <= last_right)
-//                    break;
-//            }
-//        }
     }
     qDebug("ces");
 
@@ -113,7 +105,8 @@ void ETEXT::edit_text_change()
 
 
 
-    qDebug( "left=%d", now_left );
+    qDebug( "now_left=%d,now_right=%d", now_left, now_right );
+    qDebug( "last_left=%d,last_right=%d", last_left, last_right );
 
     qDebug("文本变动");
     save_now( now_text );
