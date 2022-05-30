@@ -24,7 +24,8 @@ public:
 protected:
     ECUROSR *ecursor;
     ETEXT *etext;
-
+    QString last_send; //用来记录最近一次发送到ssh的消息，等收到回复时进行比较，以在文本框中删除发送项目
+//    int enter_pos = 0; //记录按下回车时，其所处位置
 
 
     int left_todel_count = 0; //ssh命令输入时，如果按左键，则下次会把右边几个字母也返回
@@ -42,7 +43,6 @@ protected:
 
     void eshow_delete_at( int pos );
     void eshow_backspace( int count = 1 ); //删除当前光标所在前一个字符
-    void eshow_delete( int count = 1 ); //删除当前光标所在后一个字符
 
     void edit_write2show(); //把write窗口的东西搬到show去
 
@@ -53,6 +53,9 @@ private slots:
     void on_Edit_write_textChanged();
     void on_Edit_write_cursorPositionChanged();
     void ecursor_change( int row, int column, int pos );
+    void etext_change( int delete_count, bool is_backspace, int add_count, QString new_str );
+
+
 
 private:
     Ui::PageCmd *ui;

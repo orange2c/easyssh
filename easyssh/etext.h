@@ -29,7 +29,7 @@ signals:
                         //删除计数，是否back（back是左删除，delete键是右删除），新增文本计数，新增文本
 
 public slots:
-    void edit_cursor_change(); //记录光标位置，主要用于识别backspace与delete
+    void edit_cursor_change(); //只记录光标位置，用于后续识别backspace与delete
     void edit_text_change(); //
 
 };

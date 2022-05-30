@@ -90,7 +90,7 @@ void ETEXT::edit_text_change()
     if( last_count_same < last_count ) //last中有now没有的字符
     {
         delete_count = last_count - last_count_same; //last比now多几个不存在字符，就删几次
-        qDebug( "save=%d,pos=%d", save_pos, pos );
+//        qDebug( "save=%d,pos=%d", save_pos, pos );
         if( pos == save_pos ) //如果光标位置跟之前一样，则是右删除
         {
             is_backspace = false;
@@ -101,12 +101,11 @@ void ETEXT::edit_text_change()
     QString new_str( now_text->mid( same_left, add_count ) );
 
 
-    if( is_backspace )
-        qDebug("左删除%d",delete_count );
-    else
-        qDebug("右删除%d",delete_count );
-
-    qDebug( "新增%d:%s", add_count, qPrintable( new_str ) );
+//    if( is_backspace )
+//        qDebug("左删除%d",delete_count );
+//    else
+//        qDebug("右删除%d",delete_count );
+//    qDebug( "新增%d:%s", add_count, qPrintable( new_str ) );
     save_now( now_text );
     emit text_change( delete_count, is_backspace, add_count, new_str );
 

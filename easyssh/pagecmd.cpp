@@ -16,6 +16,7 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
     ecursor->signal_enable( true );
 
     etext = new ETEXT( ui->Edit_write );
+    connect( etext, SIGNAL(text_change(int,bool,int,QString)), SLOT(etext_change(int,bool,int,QString)) );
  }
 
 PageCmd::~PageCmd()
@@ -95,32 +96,20 @@ void PageCmd::eshow_row_change(int relative)
 }
 void PageCmd::eshow_backspace( int count )
 {
-    QString show_data = ui->Edit_show->toPlainText();
-    QTextCursor docCursor = ui->Edit_show->textCursor();
+    QString show_data = ui->Edit_write->toPlainText();
+    QTextCursor docCursor = ui->Edit_write->textCursor();
     int pos = docCursor.position() ;
-    show_data.remove( pos, count );
+    show_data.remove( pos-count, count );
 
-    ui->Edit_show->clear();
-    ui->Edit_show->insertPlainText( show_data );
-    QTextCursor newCursor = ui->Edit_show->textCursor();
-    newCursor.setPosition( pos + 1 );
-    ui->Edit_show->setTextCursor( newCursor );
+
+//    ui->Edit_write->clear();
+//    ui->Edit_write->insertPlainText( show_data );
+//    QTextCursor newCursor = ui->Edit_write->textCursor();
+//    newCursor.deleteChar();
+//    newCursor.setPosition( pos  );
+//    ui->Edit_write->setTextCursor( newCursor );
 }
-void PageCmd::eshow_delete( int count )
-{
-    ui->log->append( "delete删除开始" );
 
-    QString show_data = ui->Edit_show->toPlainText();
-    QTextCursor docCursor = ui->Edit_show->textCursor();
-    int pos = docCursor.position() ;
-    show_data.remove( pos, count );
-
-    ui->Edit_show->clear();
-    ui->Edit_show->insertPlainText( show_data );
-    QTextCursor newCursor = ui->Edit_show->textCursor();
-    newCursor.setPosition( pos );
-    ui->Edit_show->setTextCursor( newCursor );
-}
 
 //接收ssh信息的槽
 void PageCmd::shell_output( QString data )
@@ -130,12 +119,21 @@ void PageCmd::shell_output( QString data )
     ecursor->signal_enable( false );
     etext->signal_enable( false );
 
-    for( int i = 0; i<data.count(); i++ )
+    int i = 0;
+    while( i < last_send.count() )
+    {
+        if( last_send.at( i )  !=  data.at( i ) )
+            break;
+        i++;
+    }
+    last_send.clear();
+
+    for( ; i<data.count(); i++ )
     {
         switch( data.at(i).toLatin1() ) //
         {
         case 0x7: //7，振铃
-            show->moveCursor(QTextCursor::End);
+//            show->moveCursor(QTextCursor::End);
             continue;
         case 0x8: //8，退格（方向键左）
             eshow_pos_change(-1);
@@ -171,7 +169,7 @@ void PageCmd::shell_output( QString data )
         }
         if( left_todel_count >0 )
         {
-            eshow_delete( left_todel_count );
+//            eshow_delete( left_todel_count );
             left_todel_count = 0;
         }
         show->insertPlainText( data.at(i) );
@@ -359,7 +357,6 @@ void PageCmd::ecursor_change( int row, int column, int pos )
 {
 
     qDebug("相对移动：r:%d c:%d pos:%d", row, column, pos );
-    return;
 
     QByteArray key_byte; //方向键的转义序列共三位，前两位固定，第三位表示方向
     key_byte.append( 0x1b );
@@ -406,8 +403,33 @@ void PageCmd::ecursor_change( int row, int column, int pos )
     QString char_move( key_byte );
     for( ; move_count >0; move_count-- )
     {
-     ssh->write( char_move );
+        ssh->write( char_move );
     }
+}
+
+void PageCmd::etext_change(int delete_count, bool is_backspace, int add_count, QString new_str)
+{
+    if( is_backspace )
+        qDebug("左删除%d",delete_count );
+    else
+        qDebug("右删除%d",delete_count );
+    qDebug( "新增%d:%s", add_count, qPrintable( new_str ) );
+
+
+    QByteArray byte;
+    byte.append( 0x8 );
+    QString char_del( byte );
+
+
+    last_send.append( new_str );
+
+    for( ; delete_count >0; delete_count-- )
+    {
+        qDebug("发送删除");
+        ssh->write( char_del );
+    }
+    ssh->write( new_str );
+
 
 
 }
