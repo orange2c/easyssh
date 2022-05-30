@@ -5,6 +5,7 @@
 #include <QKeyEvent>
 #include <QTextList>
 #include <QTextCodec>
+#include <QTextEdit>
 #include "ssh.h"
 #include "ecurosr.h"
 #include "etext.h"
@@ -24,6 +25,8 @@ public:
 protected:
     ECUROSR *ecursor;
     ETEXT *etext;
+    QTextEdit *eshadow;
+
     QString last_send; //用来记录最近一次发送到ssh的消息，等收到回复时进行比较，以在文本框中删除发送项目
 //    int enter_pos = 0; //记录按下回车时，其所处位置
 

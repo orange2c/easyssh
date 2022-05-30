@@ -17,12 +17,16 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
 
     etext = new ETEXT( ui->Edit_write );
     connect( etext, SIGNAL(text_change(int,bool,int,QString)), SLOT(etext_change(int,bool,int,QString)) );
- }
+
+    eshadow = new QTextEdit();
+}
 
 PageCmd::~PageCmd()
 {
     delete ui;
     delete ecursor;
+    delete etext;
+    delete eshadow;
 }
 
 void PageCmd::keyPressEvent(QKeyEvent *event)
@@ -114,7 +118,9 @@ void PageCmd::eshow_backspace( int count )
 //接收ssh信息的槽
 void PageCmd::shell_output( QString data )
 {
-    QTextEdit *show = ui->Edit_write;
+//    QTextEdit *show = ui->Edit_write;
+
+    QTextEdit *show = eshadow ;
 
     ecursor->signal_enable( false );
     etext->signal_enable( false );
@@ -185,6 +191,16 @@ void PageCmd::shell_output( QString data )
         ui->ascii->insertPlainText( "十进制:"+ QString::number( byte.at(i) )+ "  Hex:"+ QString::number( byte.at(i), 16 )+ ":"+byte.at(i)+ '\n' );
     }
     ui->ascii->moveCursor(QTextCursor::End);
+
+
+
+    QString text = eshadow->toHtml();
+
+    ui->Edit_write->clear();
+    ui->Edit_write->insertHtml( text );
+    ui->Edit_show->moveCursor( QTextCursor::End );
+
+
     ecursor->signal_enable( true );
     etext->signal_enable( true );
     etext->save_now();
@@ -346,10 +362,12 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
 
 void PageCmd::edit_write2show()
 {
-    QString text = ui->Edit_write->toHtml();
+    QString text = eshadow->toHtml();
     ui->Edit_show->insertHtml( text );
     ui->Edit_write->clear();
     ui->Edit_show->moveCursor( QTextCursor::End );
+
+    eshadow->clear();
 
 }
 
