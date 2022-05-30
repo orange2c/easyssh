@@ -39,44 +39,45 @@ void ETEXT::edit_text_change()
 
     int same_left = 0;
 
-    int now_right = 0;
-    int last_right = 0;
+    int same_now_right = 0;
+    int same_last_right = 0;
 
     //last从左往右与now比对是否相同
     //last从右往左与now比对是否相同
     if( (now_count!=0) && (last_count!=0) ) //必须两串大小都不为0
     {
+        int tmp_now ;
+        int tmp_last ;
         while( 1 )
         {
-            if( same_left   >=  (pos - 1) )
+            tmp_now = now_count - same_now_right - 1;
+            tmp_last = last_count - same_last_right - 1;
+
+            if(  tmp_now < pos )
                 break;
-            if( same_left   >=  last_count)
+            if(  tmp_last <= 0 )
+                break;
+
+            if( now_text->at(tmp_now) != save_text->at(tmp_last) )
+                break;
+
+            same_now_right++;
+            same_last_right++;
+        }
+
+        while( 1 )
+        {
+            if( same_left   >= pos )
+                break;
+            if( same_left   >=   (last_count - same_last_right) )
                 break;
 
             if( now_text->at(same_left) != save_text->at( same_left ) )
                 break;
 
             same_left++;
-
         }
-        int tmp_now ;
-        int tmp_last ;
-        while( 1 )
-        {
-            tmp_now = now_count - now_right - 1;
-            tmp_last = last_count - last_right - 1;
 
-            if(  tmp_now < same_left )
-                break;
-            if(  tmp_last < same_left )
-                break;
-
-            if( now_text->at(tmp_now) != save_text->at(tmp_last) )
-                break;
-
-            now_right++;
-            last_right++;
-        }
     }
 
 
@@ -93,7 +94,7 @@ void ETEXT::edit_text_change()
     }
     else if( now_count > last_count )
     {
-        if( (same_left +  now_right)  ==  last_count )
+        if( (same_left +  same_now_right)  ==  last_count )
         {
             int change_count = pos - same_left;
             qDebug("纯新增文本：%s", qPrintable( now_text->mid( same_left, change_count ) ) );
@@ -103,7 +104,7 @@ void ETEXT::edit_text_change()
 
 
     qDebug( "last_count=%d,now_count=%d", last_count, now_count );
-    qDebug( "same_left=%d,last_right=%d,now_right=%d", same_left, last_right, now_right );
+    qDebug( "same_left=%d,last_right=%d,now_right=%d", same_left, same_last_right, same_now_right );
     qDebug( "pos=%d", pos );
 
 //    qDebug("文本变动");
