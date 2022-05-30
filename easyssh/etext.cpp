@@ -36,6 +36,7 @@ void ETEXT::edit_text_change()
     int now_count = now_text->count();
     int last_count = save_text->count();
 
+
     int same_left = 0;
 
     int now_right = 0;
@@ -43,77 +44,69 @@ void ETEXT::edit_text_change()
 
     //last从左往右与now比对是否相同
     //last从右往左与now比对是否相同
-    if( now_count!=0 && last_count!=0 ) //必须两串大小都不为0
+    if( (now_count!=0) && (last_count!=0) ) //必须两串大小都不为0
     {
         while( 1 )
         {
-            if( now_text->at(same_left) != save_text->at( same_left ) )
+            if( same_left   >=  (pos - 1) )
                 break;
-            same_left++;
-            if( same_left >= pos)
-                break;
-            if( same_left >= pos)
-                break;
-        }
-        int tmp_n ;
-        int tmp_l ;
-        while( 1 )
-        {
-            tmp_n = now_count - now_right - 1;
-            tmp_l = last_count - last_right - 1;
-            if( tmp_n < pos)
-                break;
-            if( tmp_l < pos)
+            if( same_left   >=  last_count)
                 break;
 
-            if( now_text->at(tmp_n) != save_text->at(tmp_l) )
+            if( now_text->at(same_left) != save_text->at( same_left ) )
+                break;
+
+            same_left++;
+
+        }
+        int tmp_now ;
+        int tmp_last ;
+        while( 1 )
+        {
+            tmp_now = now_count - now_right - 1;
+            tmp_last = last_count - last_right - 1;
+
+            if(  tmp_now < same_left )
+                break;
+            if(  tmp_last < same_left )
+                break;
+
+            if( now_text->at(tmp_now) != save_text->at(tmp_last) )
                 break;
 
             now_right++;
             last_right++;
         }
     }
-    qDebug("ces");
 
-    if( (now_count==last_count) && (same_left==now_count)  )
+
+    if( (now_count==last_count)  )
     {
-        qDebug("误判，全相同");
+        //相同字符数的复制粘贴
+        if( (same_left < pos)  ) //左相同小于pos
+        {
+            qDebug("删除:%s", qPrintable( save_text->mid( same_left,  pos - same_left ) )  );
+            qDebug("粘贴：%s", qPrintable( now_text->mid( same_left, pos - same_left ) ) );
+        }
+        else
+            qDebug("误判，全相同");
+    }
+    else if( now_count > last_count )
+    {
+        if( (same_left +  now_right)  ==  last_count )
+        {
+            int change_count = pos - same_left;
+            qDebug("纯新增文本：%s", qPrintable( now_text->mid( same_left, change_count ) ) );
+        }
+
     }
 
-//    if(  )
-//    if( (now_left+1 == now_right) && (last_left+1 == last_right)  ) //两者相同，不做操作
-//    {
 
-//    }
-//    else if( (last_left+1 == last_right) &&  (now_right == pos) )//如果last的都存在，且新增的刚好到pos则为纯新增
-//    {
-//        qDebug("纯新增");
-//        emit text_add( now_text->mid( last_left, last_right-last_left ) );
-//        //
-//    }
+    qDebug( "last_count=%d,now_count=%d", last_count, now_count );
+    qDebug( "same_left=%d,last_right=%d,now_right=%d", same_left, last_right, now_right );
+    qDebug( "pos=%d", pos );
 
-//    else if( (now_left+1 == now_right) &&  (last_left+1 != last_right) )//如果now的都存在，且last有多的字符
-//    {
-//        qDebug("删除");
-//        if( (last_left < pos) && (last_right == pos) )
-//        {
-//            qDebug( "左删除" );
-//            emit text_del( pos-last_left, true );
-//        }
-//        else if( (last_left == pos) && (last_right > pos) )
-//        {
-//            qDebug( "右删除" );
-//            emit text_del( last_right-pos, false );
-//        }
-//    }
-
-
-
-
-    qDebug( "same_left=%d,now_right=%d", same_left, now_right );
-    qDebug( "same_left=%d,last_right=%d", same_left, last_right );
-
-    qDebug("文本变动");
+//    qDebug("文本变动");
     save_now( now_text );
 
 
