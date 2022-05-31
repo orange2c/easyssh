@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTextCursor>
 #include <QTextEdit>
+#include <QTextBlock>
 
 class ESHADOW : public QObject
 {
@@ -27,6 +28,11 @@ protected:
     QTextEdit *Edit_show;  //指向编辑窗口
 
 
+
+    void shadow_pos_change( int relative ); //让show窗口的光标，左右移动相对位置
+    void shadow_backspace( int count = 1 ); //删除当前光标所在前一个字符
+    void shadow_delete( int count = 1 ); //删除当前光标所在后一个字符
+    void shadow_delete_blockEND( );
 
 
 signals:

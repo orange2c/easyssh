@@ -38,19 +38,55 @@ void ESHADOW::updata_wirte()
 
 }
 
+
+
+void ESHADOW::shadow_pos_change(int relative)
+{
+    QTextCursor docCursor = Edit_shadow->textCursor();
+    int now_pos = docCursor.position();  //获取当前pos位置
+
+    now_pos += relative;
+
+    int count = Edit_shadow->toPlainText().count();
+    if( now_pos < 0 ) now_pos = 0;
+    if( now_pos > count ) now_pos = count ;
+
+    docCursor.setPosition( now_pos );
+    Edit_shadow->setTextCursor( docCursor );
+}
+
+void ESHADOW::shadow_backspace( int count )
+{
+    QTextCursor docCursor = Edit_shadow->textCursor();
+    for( ; count >0; count-- )
+        docCursor.deletePreviousChar();
+}
+void ESHADOW::shadow_delete( int count )
+{
+    shadow_pos_change( count );
+    QTextCursor docCursor = Edit_shadow->textCursor();
+    for( ; count >0; count-- )
+        docCursor.deletePreviousChar();
+}
+void ESHADOW::shadow_delete_blockEND()
+{
+    QTextCursor docCursor = Edit_shadow->textCursor();
+    QTextDocument *doc = Edit_shadow->document();
+    QTextBlock docBlock  =  doc->findBlock( docCursor.position() );
+    int line_count = docBlock.text().count() - docCursor.positionInBlock() ;
+    shadow_delete( line_count );
+
+
+}
+
 void ESHADOW::shell_listen(QString data)
 {
 
-    int i = 0;
-//    while( i < last_send.count() )
-//    {
-//        if( last_send.at( i )  !=  data.at( i ) )
-//            break;
-//        i++;
-//    }
-    last_send.clear();
+    Edit_hex->append( "接收新消息----------:\n" );
 
-    for( ; i<data.count(); i++ )
+    bool is_enter = false;
+
+    for( int i = 0; i<data.count(); i++ )
     {
         switch( data.at(i).toLatin1() ) //
         {
@@ -58,14 +94,16 @@ void ESHADOW::shell_listen(QString data)
 //            show->moveCursor(QTextCursor::End);
             continue;
         case 0x8: //8，退格（方向键左）
-//            eshow_pos_change(-1);
+            shadow_pos_change( -1 );
             continue;
         case '\r':
             if( data.at(i+1).toLatin1() == '\n' )
             {
                 i += 1;
-                Edit_shadow->insertPlainText( "\n" );
+
                 updata_show();
+                Edit_shadow->insertPlainText( "\n" );
+                is_enter = true;
                 continue;
             }
 
@@ -75,13 +113,13 @@ void ESHADOW::shell_listen(QString data)
                 if( data.at(i+2).toLatin1() == 'C' ) //向右移动一格
                 {
                     i+=2;
-//                    eshow_pos_change(+1);
+                    shadow_pos_change( +1 );
                     continue;
                 }
-                if( data.at(i+2).toLatin1() == 0x4b ) //删除
+                if( data.at(i+2).toLatin1() == 0x4b ) //从光标删除到行尾
                 {
                     i+=2;
-//                    eshow_backspace();
+                    shadow_delete_blockEND();
                 }
             }
             else
@@ -102,6 +140,11 @@ void ESHADOW::shell_listen(QString data)
     for( int i=0; i< byte.count(); i++ )
     {
         Edit_hex->insertPlainText( "十进制:"+ QString::number( byte.at(i) )+ "  Hex:"+ QString::number( byte.at(i), 16 )+ ":"+byte.at(i)+ '\n' );
+    }
+    if( is_enter )
+    {
+        Edit_shadow->insertPlainText( "\n" );
+        shadow_pos_change( -1 );
     }
     Edit_hex->moveCursor(QTextCursor::End);
     Edit_show->moveCursor( QTextCursor::End );
