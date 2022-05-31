@@ -101,7 +101,7 @@ void ESHADOW::shell_listen(QString data)
             {
                 i += 1;
 
-                updata_show();
+//                updata_show();
                 Edit_shadow->insertPlainText( "\n" );
                 is_enter = true;
                 continue;

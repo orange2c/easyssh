@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+#include <QTextCodec>
 
 #include <fcntl.h>
 #include <errno.h>
@@ -14,7 +15,7 @@
 int main(int argc, char *argv[])
 {
 
-
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
 
     QApplication a(argc, argv);
 

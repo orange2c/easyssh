@@ -127,6 +127,7 @@ void PageCmd::on_Button1_clicked()
 //    byte.append( 'A' );//转义序列
 //    QString char_move( byte );
 //    ssh->write( char_move );
+    ssh->write( "vim VULTR_KEY.txt" );
 
 }
 
@@ -214,6 +215,6 @@ void PageCmd::etext_change(int delete_count, bool is_backspace, int add_count, Q
     }
 
     qDebug( "新增%d:%s", add_count, qPrintable( new_str ) );
-    ssh->write( new_str );
+//    ssh->write( new_str );
 
 }

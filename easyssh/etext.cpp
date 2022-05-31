@@ -16,11 +16,12 @@ ETEXT::~ETEXT()
 
 void ETEXT::save_now( QString *text )
 {
+    QTextDocument *doc = Edit->document();
     if( save_text != NULL )
         delete save_text;
 
     if( text == NULL )
-        save_text = new QString( Edit->toPlainText() );
+        save_text = new QString( doc->toRawText() );
     else
         save_text = text;
 
@@ -40,7 +41,10 @@ void ETEXT::edit_text_change()
     if( ! is_signal_enable )
         return;
 
-    QString *now_text = new QString( Edit->toPlainText() );
+//    QString *now_text = new QString( Edit->toPlainText() );
+    QTextDocument *doc = Edit->document();
+    QString *now_text = new QString( doc->toRawText() );
+
     QTextCursor cursor = Edit->textCursor();
     int pos = cursor.position();
 
@@ -98,14 +102,9 @@ void ETEXT::edit_text_change()
     }
 
     int add_count = pos - same_left;
-    QString new_str( now_text->mid( same_left, add_count ) );
+    QString new_str( now_text->mid( same_left, add_count ).toLatin1() );
 
-
-//    if( is_backspace )
-//        qDebug("左删除%d",delete_count );
-//    else
-//        qDebug("右删除%d",delete_count );
-//    qDebug( "新增%d:%s", add_count, qPrintable( new_str ) );
+    qDebug( "now=%s", qPrintable( *now_text ) );
     save_now( now_text );
     emit text_change( delete_count, is_backspace, add_count, new_str );
 
