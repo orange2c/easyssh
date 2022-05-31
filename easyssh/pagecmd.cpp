@@ -153,7 +153,10 @@ void PageCmd::ecursor_change( int row, int column, int pos )
         key_byte.append( 'B' );//转义序列
         move_count = 1 ;
         ui->log->append( "方向键下" );
-        ecursor->move_rel( -pos );
+
+        ecursor->signal_enable( false );
+//        ecursor->move_rel( -pos );
+        ecursor->signal_enable( true );
     }
     //方向键向右移动
     else if( column > 0 )
@@ -190,26 +193,27 @@ void PageCmd::ecursor_change( int row, int column, int pos )
 void PageCmd::etext_change(int delete_count, bool is_backspace, int add_count, QString new_str)
 {
     if( is_backspace )
+    {
         qDebug("左删除%d",delete_count );
+    }
     else
+    {
         qDebug("右删除%d",delete_count );
-    qDebug( "新增%d:%s", add_count, qPrintable( new_str ) );
-
-
+    }
+    char byte_right[] = { 0x1b, 0x5b, 'C'};
+    QByteArray move_right( byte_right, 3 );
     QByteArray byte;
     byte.append( 0x8 );
     QString char_del( byte );
-
-
-    eshadow->last_send.append( new_str );
-
     for( ; delete_count >0; delete_count-- )
     {
         qDebug("发送删除");
+        if( !is_backspace )
+            ssh->write( move_right );
         ssh->write( char_del );
     }
+
+    qDebug( "新增%d:%s", add_count, qPrintable( new_str ) );
     ssh->write( new_str );
-
-
 
 }

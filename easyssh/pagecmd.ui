@@ -43,14 +43,17 @@
    <widget class="QPushButton" name="Button2">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>350</y>
-      <width>101</width>
-      <height>51</height>
+      <x>160</x>
+      <y>360</y>
+      <width>81</width>
+      <height>41</height>
      </rect>
     </property>
+    <property name="toolTip">
+     <string>点击此按钮，进入键盘转发模式，此时按下的按键都会被转发过去</string>
+    </property>
     <property name="text">
-     <string>功能2</string>
+     <string>按键转发</string>
     </property>
    </widget>
    <widget class="QTextEdit" name="Edit_write">
