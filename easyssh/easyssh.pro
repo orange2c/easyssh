@@ -14,14 +14,16 @@ SOURCES += \
     ssh.cpp \
     pagecmd.cpp \
     ecurosr.cpp \
-    etext.cpp
+    etext.cpp \
+    eshadow.cpp
 
 HEADERS += \
     login.h \
     ssh.h \
     pagecmd.h \
     ecurosr.h \
-    etext.h
+    etext.h \
+    eshadow.h
 
 FORMS += \
     login.ui \

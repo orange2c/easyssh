@@ -8,7 +8,7 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
 {
     ui->setupUi(this);
     connect( ssh, SIGNAL(shell_output(QString)), SLOT(shell_output(QString)) );
-    init_edit();
+
     ui->Edit_write->setFocus();
 
     ecursor = new ECUROSR( ui->Edit_write );
@@ -18,7 +18,11 @@ PageCmd::PageCmd( SSH *p_ssh, QWidget *parent) :
     etext = new ETEXT( ui->Edit_write );
     connect( etext, SIGNAL(text_change(int,bool,int,QString)), SLOT(etext_change(int,bool,int,QString)) );
 
-    eshadow = new QTextEdit();
+    eshadow = new ESHADOW( ui->Edit_write, ui->Edit_show );
+    eshadow->Edit_original = ui->Edit_show2;
+    eshadow->Edit_hex = ui->ascii;
+//    connect( ssh, SIGNAL(shell_output(QString)), eshadow, SLOT(shell_listen(QString))   );
+
 }
 
 PageCmd::~PageCmd()
@@ -106,100 +110,16 @@ void PageCmd::eshow_backspace( int count )
     show_data.remove( pos-count, count );
 
 
-//    ui->Edit_write->clear();
-//    ui->Edit_write->insertPlainText( show_data );
-//    QTextCursor newCursor = ui->Edit_write->textCursor();
-//    newCursor.deleteChar();
-//    newCursor.setPosition( pos  );
-//    ui->Edit_write->setTextCursor( newCursor );
 }
 
 
 //接收ssh信息的槽
 void PageCmd::shell_output( QString data )
 {
-//    QTextEdit *show = ui->Edit_write;
-
-    QTextEdit *show = eshadow ;
-
     ecursor->signal_enable( false );
     etext->signal_enable( false );
 
-    int i = 0;
-    while( i < last_send.count() )
-    {
-        if( last_send.at( i )  !=  data.at( i ) )
-            break;
-        i++;
-    }
-    last_send.clear();
-
-    for( ; i<data.count(); i++ )
-    {
-        switch( data.at(i).toLatin1() ) //
-        {
-        case 0x7: //7，振铃
-//            show->moveCursor(QTextCursor::End);
-            continue;
-        case 0x8: //8，退格（方向键左）
-            eshow_pos_change(-1);
-            continue;
-        case '\r':
-            if( data.at(i+1).toLatin1() == '\n' )
-            {
-                i += 1;
-                show->insertPlainText( "\n" );
-                edit_write2show();
-                continue;
-            }
-
-        case 0x1b: //ESC 一堆转义序列的起始
-            if( data.at(i+1).toLatin1() == 0x5b)
-            {
-                if( data.at(i+2).toLatin1() == 'C' ) //向右移动一格
-                {
-                    i+=2;
-                    eshow_pos_change(+1);
-                    continue;
-                }
-                if( data.at(i+2).toLatin1() == 0x4b ) //删除
-                {
-                    i+=2;
-                    eshow_backspace();
-                }
-            }
-            else
-                break; //直接退出
-            continue;
-
-        }
-        if( left_todel_count >0 )
-        {
-//            eshow_delete( left_todel_count );
-            left_todel_count = 0;
-        }
-        show->insertPlainText( data.at(i) );
-    }
-
-
-    ui->Edit_show2->insertPlainText(data);
-    ui->Edit_show2->moveCursor(QTextCursor::End);
-
-    QByteArray byte = data.toUtf8();
-    for( int i=0; i< byte.count(); i++ )
-    {
-        ui->ascii->insertPlainText( "十进制:"+ QString::number( byte.at(i) )+ "  Hex:"+ QString::number( byte.at(i), 16 )+ ":"+byte.at(i)+ '\n' );
-    }
-    ui->ascii->moveCursor(QTextCursor::End);
-
-
-
-    QString text = eshadow->toHtml();
-
-    ui->Edit_write->clear();
-    ui->Edit_write->insertHtml( text );
-    ui->Edit_show->moveCursor( QTextCursor::End );
-
+    eshadow->shell_listen( data );
 
     ecursor->signal_enable( true );
     etext->signal_enable( true );
@@ -216,26 +136,6 @@ void PageCmd::on_Button1_clicked()
 //    QString char_move( byte );
 //    ssh->write( char_move );
     eshow_row_change(-1);
-}
-
-void PageCmd::init_edit()
-{
-    is_init_deit = true;
-
-    ui->Edit_write->clear();
-    ui->Edit_write->insertPlainText( "\n\n " );
-
-    QTextCursor tmpCursor = ui->Edit_write->textCursor();
-    tmpCursor.setPosition( 1 ); //设置初始位置
-    ui->Edit_write->setTextCursor( tmpCursor );
-
-    last_cmd_text = ui->Edit_write->toPlainText();
-    QTextCursor docCursor = ui->Edit_write->textCursor();
-    last_cmd_pos = docCursor.position();
-
-    ui->log->append("init_deit执行");
-    is_init_deit = false;
-
 }
 
 //输入框文本变动事件
@@ -360,16 +260,7 @@ void PageCmd::on_Edit_write_cursorPositionChanged()
 //    last_cmd_pos = pos;
 }
 
-void PageCmd::edit_write2show()
-{
-    QString text = eshadow->toHtml();
-    ui->Edit_show->insertHtml( text );
-    ui->Edit_write->clear();
-    ui->Edit_show->moveCursor( QTextCursor::End );
 
-    eshadow->clear();
-
-}
 
 void PageCmd::ecursor_change( int row, int column, int pos )
 {
@@ -439,7 +330,7 @@ void PageCmd::etext_change(int delete_count, bool is_backspace, int add_count, Q
     QString char_del( byte );
 
 
-    last_send.append( new_str );
+    eshadow->last_send.append( new_str );
 
     for( ; delete_count >0; delete_count-- )
     {
