@@ -115,7 +115,6 @@ void PageCmd::shell_output( QString data )
 
     ecursor->signal_enable( true );
     etext->signal_enable( true );
-    etext->save_now();
 
 }
 

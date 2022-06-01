@@ -6,7 +6,7 @@ ETEXT::ETEXT( QTextEdit *text_edit, QObject *parent) :
     connect( Edit, SIGNAL(textChanged()), SLOT(edit_text_change()) );
     connect( Edit, SIGNAL(cursorPositionChanged()), SLOT(edit_cursor_change()) );
     Doc = Edit->document();
-    save_text = new QString( Edit->toPlainText() );
+//    save_text = new QString( Edit->toPlainText() );
 }
 ETEXT::~ETEXT()
 {
@@ -17,6 +17,7 @@ ETEXT::~ETEXT()
 void ETEXT::save_now( QString *text )
 {
     QTextDocument *doc = Edit->document();
+
     if( save_text != NULL )
         delete save_text;
 
@@ -38,12 +39,11 @@ void ETEXT::edit_cursor_change()
 
 void ETEXT::edit_text_change()
 {
-    if( ! is_signal_enable )
-        return;
+
 
 //    QString *now_text = new QString( Edit->toPlainText() );
     QTextDocument *doc = Edit->document();
-    QString *now_text = new QString( doc->toRawText() );
+    QString *now_text = new QString( doc->toPlainText() );
 
     QTextCursor cursor = Edit->textCursor();
     int pos = cursor.position();
@@ -102,11 +102,12 @@ void ETEXT::edit_text_change()
     }
 
     int add_count = pos - same_left;
-    QString new_str( now_text->mid( same_left, add_count ).toLatin1() );
+    QString new_str( now_text->mid( same_left, add_count ) );
 
-    qDebug( "now=%s", qPrintable( *now_text ) );
+//    qDebug( "now=%s", qPrintable( *now_text ) );
     save_now( now_text );
-    emit text_change( delete_count, is_backspace, add_count, new_str );
+    if(  is_signal_enable )
+        emit text_change( delete_count, is_backspace, add_count, new_str );
 
 }
 

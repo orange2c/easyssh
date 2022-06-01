@@ -23,7 +23,7 @@ void SSH::login(QString Host, QString username, QString password)
 }
 void SSH::write(QString cmd)
 {
-    m_shell->write(cmd.toLatin1().data());
+    m_shell->write(cmd.toUtf8().data());
 }
 
 void SSH::_connect_success()
