@@ -31,7 +31,6 @@ void ESHADOW::updata_wirte()
     QTextCursor shadowCursor = Edit_shadow->textCursor();
     int shadow_pos = shadowCursor.position();  //获取当前pos位置
 
-
     QTextCursor writeCursor = Edit_write->textCursor();
     writeCursor.setPosition( shadow_pos );
     Edit_write->setTextCursor( writeCursor );
@@ -78,56 +77,71 @@ void ESHADOW::shadow_delete_blockEND()
 
 
 }
+/*
+转义序列类型
+光标相对移动 光标绝对移动 颜色 缓冲区切换
+转义序列示例：
+ESC [ ? 1 h    切换屏幕缓冲区
+*/
+
+
 
 void ESHADOW::shell_listen(QString data)
 {
 
-    Edit_hex->append( "接收新消息----------:\n" );
+    Edit_hex->append( "接收新消息:"+  QString::number( data.count() )+  "\n-----"  );
+    Edit_hex->append( data );
+    Edit_hex->append( "-----\n" );
 
     bool is_enter = false;
 
     for( int i = 0; i<data.count(); i++ )
     {
+
         switch( data.at(i).toLatin1() ) //
         {
-        case 0x7: //7，振铃
-//            show->moveCursor(QTextCursor::End);
-            continue;
-        case 0x8: //8，退格（方向键左）
-            shadow_pos_change( -1 );
-            continue;
-        case '\r':
-            if( data.at(i+1).toLatin1() == '\n' )
-            {
-                i += 1;
-
-//                updata_show();
-                Edit_shadow->insertPlainText( "\n" );
-                is_enter = true;
+            case 0x7: //7，振铃
                 continue;
-            }
 
-        case 0x1b: //ESC 一堆转义序列的起始
-            if( data.at(i+1).toLatin1() == 0x5b)
-            {
-                if( data.at(i+2).toLatin1() == 'C' ) //向右移动一格
-                {
-                    i+=2;
-                    shadow_pos_change( +1 );
-                    continue;
-                }
-                if( data.at(i+2).toLatin1() == 0x4b ) //从光标删除到行尾
-                {
-                    i+=2;
-                    shadow_delete_blockEND();
-                }
-            }
-            else
-                break; //直接退出
-            continue;
+            case 0x8: //8，退格（方向键左）
+                shadow_pos_change( -1 );
+                continue;
 
+            case 0xd: //回车符号
+                if( data.at(i+1).toLatin1() == 0xa )
+                {
+                    Edit_shadow->insertPlainText( "\n" );
+                    if( !is_screen_buffer )//如果不是在备用屏幕缓冲区中，则可以更新
+                        updata_show();
+//                    is_enter = true;
+                    i += 2;
+                }
+                continue;
+
+            case 0x1b: //ESC 一堆转义序列的起始
+                i++;
+                switch( data.at(i).toLatin1() )
+                {
+                    case 0x5b: //符号是 [
+                        i++;
+                        switch( data.at(i).toLatin1() )
+                        {
+                            case 'C'://向右移动一格
+                                shadow_pos_change( +1 );
+                                i++;
+                                continue;
+                            case 0x4b: //删除到行尾
+                                shadow_delete_blockEND();
+                                i++;
+                                continue;
+
+                        }
+
+
+                }
         }
 
+        //如果没有任何转移符号，则直接插入框内
         Edit_shadow->insertPlainText( data.at(i) );
 
     }
